@@ -1,23 +1,11 @@
 <template>
-  <g style="cursor: pointer" @click="emits('onHexClick')">
+  <g style="cursor: pointer" @click="emits('onHexClick', props.id)">
     <polygon
         :points="points"
-        :fill="fill"
+        :fill="fill ?? getFill()"
         :stroke="stroke"
-        :stroke-width="strokeWidth"
+        :stroke-width="1"
     />
-    <text
-        v-if="text"
-        :x="props.x"
-        :y="props.y + fontSize / 5"
-        :font-size="fontSize"
-        :fill="textColor"
-        text-anchor="middle"
-        dominant-baseline="middle"
-        style="user-select: none;"
-    >
-      {{ text }}
-    </text>
   </g>
 </template>
 
@@ -27,12 +15,10 @@ import { computed, defineProps, defineEmits } from 'vue'
 interface Props {
   x: number
   y: number
+  id: number
   radius: number
-  text?: string
-  textColor?: string
+  mode?: 'origin' | 'fight-fortress' | 'gold-center' | 'black-swamp' | 'chance-place' | 'secret-place' | 'normal'
   fill?: string
-  stroke?: string
-  strokeWidth?: number
 }
 
 const emits = defineEmits(['onHexClick'])
@@ -42,7 +28,7 @@ const props = defineProps<Props>()
 const points = computed(() => {
   const pts = []
   for (let i = 0; i < 6; i++) {
-    const angle = Math.PI / 3 * i - Math.PI / 6
+    const angle = Math.PI / 3 * i
     const px = props.x + props.radius * Math.cos(angle)
     const py = props.y + props.radius * Math.sin(angle)
     pts.push(`${px},${py}`)
@@ -50,12 +36,25 @@ const points = computed(() => {
   return pts.join(' ')
 })
 
-const fill = props.fill ?? '#1976d2'
-const stroke = props.stroke ?? '#333'
-const strokeWidth = props.strokeWidth ?? 1
-
-const fontSize = props.radius / 2
-const textColor = props.textColor ?? '#fff'
+const getFill = () => {
+  switch (props.mode) {
+    case 'origin':
+      return '#8c8c8c'
+    case 'fight-fortress':
+      return '#ff9924'
+    case 'gold-center':
+      return '#fc3232'
+    case 'secret-place':
+      return '#3297fc'
+    case 'black-swamp':
+      return '#1e1e1e'
+    case 'chance-place':
+      return '#0ccb12'
+    default:
+      return '#ffffff'
+  }
+}
+const stroke = '#333'
 </script>
 
 
