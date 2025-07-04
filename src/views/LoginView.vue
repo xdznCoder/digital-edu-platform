@@ -3,77 +3,38 @@
     <div class="login-header">数字化智能教学互动平台</div>
     <div class="login-box-container d-flex justify-center align-center">
       <v-sheet :width="500" class="login-box rounded-xl">
+
+        <div class="h-0 ml-6 mt-4 text-lg return-button" v-if="registerMode" @click="registerMode = false">
+          <v-icon class="mb-1" icon="mdi-chevron-left"/>{{ ' 返回' }}</div>
         <div class="mx-12 my-10">
-          <div class="text-h5 mb-8 font-weight-bold">教师登录</div>
-          <v-text-field
-              density="compact"
-              placeholder="请输入邮箱"
-              prepend-inner-icon="mdi-email-outline"
-              variant="outlined"
-              prefix="   "
-              class="mb-2"
-              rounded
-              v-model="email"
-          ></v-text-field>
-
-
-          <v-text-field
-              :append-inner-icon="passwordVisible ? 'mdi-eye-off' : 'mdi-eye'"
-              density="compact"
-              placeholder="请输入密码"
-              prefix="   "
-              variant="outlined"
-              rounded
-              v-model="password"
-
-              prepend-inner-icon="mdi-lock-outline"
-              :type="passwordVisible ? 'text' : 'password'"
-              @click:append-inner="passwordVisible = !passwordVisible"
-          ></v-text-field>
-          <div class="d-flex justify-end">
-            <a
-                class="text-caption text-decoration-none text-blue"
-                href="#"
-                rel="noopener noreferrer"
-                target="_blank"
-            >
-              忘记密码?</a>
+          <div class="text-h5 mb-8 font-weight-bold" v-if="!registerMode">教师登录</div>
+          <div class="text-h5 mb-8 font-weight-bold" v-if="registerMode">新用户注册</div>
+          <RegisterBox v-if="registerMode" @push-back="registerMode = false"/>
+          <CaptchaLogin v-if="!registerMode && captchaMode" />
+          <PasswordLogin v-if="!registerMode && !captchaMode"/>
+          <div class="d-flex justify-end mt-3 mr-2">
+            <a class="text-caption text-decoration-none text-blue" v-if="!registerMode" href="#" @click="registerMode = true">新用户注册</a>
+            <div class="mx-2 login-box-divider" v-if="!registerMode">|</div>
+            <a class="text-caption text-decoration-none text-blue" v-if="!registerMode" href="#" @click="captchaMode = !captchaMode">{{captchaMode ? '邮箱密码登录' : '验证码登录'}}</a>
           </div>
-          <v-btn block rounded color="blue-lighten-1" class="mt-8" size="large" @click="handleLogin">登录</v-btn>
         </div>
       </v-sheet>
     </div>
     <div class="login-footer d-flex justify-center align-center">
       <div>Copyright © 2025 西南石油大学</div>
     </div>
-    <v-snackbar :color="snackBar.color" v-model="snackBar.show" :text="snackBar.message" location="top"></v-snackbar>
   </div>
 </template>
 
 
 <script setup lang="ts">
+import PasswordLogin from "@/components/login/PasswordLogin.vue";
 import {ref} from "vue";
-import {SnackBar} from "@/types/snackbar";
-import {useRouter} from "vue-router";
+import CaptchaLogin from "@/components/login/CaptchaLogin.vue";
+import RegisterBox from "@/components/login/RegisterBox.vue";
 
-const routers = useRouter();
-
-const passwordVisible = ref<boolean>(false);
-const email = ref<string>("");
-const password = ref<string>("");
-const snackBar = ref<SnackBar>(new SnackBar());
-
-function handleLogin() {
-  if (password.value === "123456" && email.value === "admin") {
-    snackBar.value.showSuccessMessage('登录成功')
-    setTimeout(() => {
-      routers.push("/")
-    }, 1000)
-    return
-  }
-
-  snackBar.value.showErrorMessage('邮箱或密码错误')
-}
+const captchaMode = ref<boolean>(false)
+const registerMode = ref<boolean>(false)
 </script>
 
 
@@ -103,5 +64,14 @@ function handleLogin() {
 }
 .login-footer {
   height: 5vh;
+}
+.login-box-divider {
+  position: relative;
+  bottom: 2px;
+  color: #8a8a8a;
+}
+.return-button {
+  user-select: none;
+  cursor: pointer;
 }
 </style>
