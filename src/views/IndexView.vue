@@ -7,7 +7,7 @@
           <div class="index-sidebar">
             <SideBar />
           </div>
-          <div class="index-main mr-10 rounded-lg">
+          <div class="index-main ml-2 mr-10 rounded-lg">
             <router-view />
           </div>
     </div>

@@ -40,5 +40,23 @@ export const classes = {
         method: 'GET',
         data: {code},
         withToken: true
+    }),
+    ClassDetail: (id: number) => request({
+        url: "/class/:id",
+        method: 'GET',
+        pathParam: {id},
+        withToken: true
+    }),
+    DeleteClass: (id: number) => request({
+       url: '/class/:id',
+       method: 'DELETE',
+       pathParam: {id},
+       withToken: true
+    }),
+    StudentList: (cid: number, pageNum: number, pageSize: number, key: string) => request({
+        url: '/class/student/list',
+        method: 'GET',
+        data: {cid, pageNum, pageSize, key},
+        withToken: true
     })
 }

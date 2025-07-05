@@ -12,7 +12,24 @@
     <v-divider />
     <v-tabs-window v-model="tab">
       <v-tabs-window-item value="one" class="pa-4">
-        <div class="operate-area d-flex justify-end mr-4">
+        <div class="operate-area d-flex justify-space-between mr-4">
+          <div class="d-flex">
+            <v-text-field
+                v-model="keyWord"
+                class="ml-6"
+                variant="outlined"
+                density="compact"
+                rounded
+                width="300px"
+                append-inner-icon="mdi-magnify"
+                placeholder="搜索班级"
+                hide-details
+                clearable
+                single-line
+                @click:append-inner="useClassList"
+                @click:clear="useClassList"
+            ></v-text-field>
+          </div>
           <v-btn color="primary" variant="outlined" rounded @click="handleNewClass">添加班级</v-btn>
         </div>
         <ClassCards v-if="classList" :data="classList.list"/>
@@ -38,6 +55,7 @@ import ClassCards from "@/components/class/ClassCards.vue";
 const tab = ref<string>('one')
 const overlay = ref<boolean>(false)
 const classList = ref<ApiMap['/class/list']['resp'] | null>(null)
+const keyWord = ref<string>('')
 
 function handleNewClass() {
   overlay.value = true
@@ -49,7 +67,7 @@ onMounted(() => {
 
 const useClassList = () => {
   useApi({
-    api: classes.ClassList(1, 10, ''),
+    api: classes.ClassList(1, 10, keyWord.value),
     onSuccess: resp => {
       classList.value = resp.data as ApiMap['/class/list']['resp']
     }

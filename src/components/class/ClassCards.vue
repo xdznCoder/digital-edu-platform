@@ -11,10 +11,12 @@
           class="px-2"
       >
         <v-card
+            class="py-2"
             hover
             prepend-icon="mdi-school-outline"
             :title="value.classCode"
             color="indigo-lighten-2"
+            @click="routers.push({path: '/detail', query: {id: value.id}})"
         >
           <v-card-item>
             <v-card-subtitle>
@@ -33,6 +35,9 @@
 
 <script setup lang="ts">
 import {defineProps} from 'vue'
+import {useRouter} from "vue-router";
+
+const routers = useRouter()
 
 defineProps<{
   data: Array<{

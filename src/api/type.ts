@@ -48,5 +48,38 @@ export interface ApiMap {
     '/class': {
         req: {code: string}
         resp: null
+    },
+    '/class/:id': {
+        req: {id: number}
+        resp: {
+            id: number
+            classCode: string
+            courseId: number
+            currentStudents: number
+            status: number
+            gmtCreate: string
+            gmtModified: string
+            isDeleted: number
+            tid: number
+        }
+    },
+    '/class/student/list': {
+        req: {pageNum: number, pageSize: number,cid: number, key: string },
+        resp: {
+            list: Array<{
+                sno: string
+                name: string
+                cid: number
+                id: number
+            }>
+            total: number
+            current: number
+            size: number
+            sizes: number
+        }
+    },
+    '/class/{id}': {
+        req: {id: number}
+        resp: null
     }
 }

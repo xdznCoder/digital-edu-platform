@@ -1,0 +1,44 @@
+<template>
+  <div class="file-upload d-flex">
+    <input
+        ref="fileInput"
+        type="file"
+        class="hidden-input"
+        @change="handleFileChange"
+        accept=".jpg,.png,.pdf,.doc,.docx"
+    />
+
+    <v-btn color="primary" variant="outlined" rounded @click="triggerFileInput">
+      <v-icon start icon="mdi-upload" />
+      上传学生数据
+    </v-btn>
+  </div>
+</template>
+
+<script setup lang="ts">
+import {ref, defineEmits} from "vue";
+
+const file = ref<File | null>(null)
+const fileInput = ref<HTMLInputElement | null>(null)
+
+const emits = defineEmits(['upload'])
+
+function triggerFileInput() {
+  fileInput.value?.click()
+}
+
+function handleFileChange(event: Event) {
+  const target = event.target as HTMLInputElement
+  const selectedFile = target.files?.[0]
+  if (selectedFile) {
+    file.value = selectedFile
+    emits('upload', selectedFile)
+  }
+}
+</script>
+
+<style scoped lang="scss">
+.hidden-input {
+  display: none;
+}
+</style>

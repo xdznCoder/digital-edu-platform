@@ -3,6 +3,7 @@ import IndexView from "@/views/IndexView.vue";
 import LoginView from "@/views/LoginView.vue";
 import ClassView from "@/views/index/ClassView.vue";
 import EmptyView from "@/views/EmptyView.vue";
+import ClassDetail from "@/views/index/ClassDetail.vue";
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -14,6 +15,11 @@ const routes: Array<RouteRecordRaw> = [
         path: '',
         name: 'class',
         component: ClassView,
+      },
+      {
+        path: 'detail',
+        name: 'detail',
+        component: ClassDetail
       },
       {
         path: ':childPathMatch(.*)*',
