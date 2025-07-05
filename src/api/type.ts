@@ -62,6 +62,9 @@ export interface ApiMap {
             isDeleted: number
             tid: number
         }
+    } | {
+        req: {id: number}
+        resp: null
     },
     '/class/student/list': {
         req: {pageNum: number, pageSize: number,cid: number, key: string },
@@ -78,8 +81,16 @@ export interface ApiMap {
             sizes: number
         }
     },
-    '/class/{id}': {
-        req: {id: number}
+    '/class/student': {
+        req: Array<number>
+        resp: null
+    },
+    '/class/upload': {
+        req: {id: number,file: File}
+        resp: null
+    },
+    '/class/upload/single': {
+        req: { sno: string, name: string, cid: number}
         resp: null
     }
 }

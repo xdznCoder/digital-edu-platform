@@ -5,7 +5,7 @@
         type="file"
         class="hidden-input"
         @change="handleFileChange"
-        accept=".jpg,.png,.pdf,.doc,.docx"
+        accept=".xlsx"
     />
 
     <v-btn color="primary" variant="outlined" rounded @click="triggerFileInput">

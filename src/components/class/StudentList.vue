@@ -4,7 +4,6 @@
     <div class="student-table">
       <v-data-table-server
           :headers="headers"
-          select-strategy="single"
           v-model="selectedStudent"
           show-select
           v-if="studentList"
@@ -17,12 +16,13 @@
           items-per-page-text="每页展示："
           :page-text="`第 ${pageNum} 页，共 ${totalNum} 名`"
           @update:options="useStudentList"
+          :loading="loading"
           hover
       />
       <v-btn color="red-lighten-2"
              v-if="selectedStudent && Object.keys(selectedStudent).length > 0"
              class="ml-6 delete-button"
-             @click="console.log(selectedStudent)"
+             @click="useDeleteStudent"
       >删除</v-btn>
     </div>
   </div>
@@ -36,6 +36,7 @@ import {classes} from "@/api";
 
 const props = defineProps<{
   cid: number,
+  loading: boolean,
 }>()
 
 const studentList = ref<ApiMap['/class/student/list']['resp']['list'] | null>(null)
@@ -64,6 +65,18 @@ const useStudentList = () => {
       totalNum.value = data.total
       studentList.value = data.list
     }
+  })
+}
+
+const useDeleteStudent = () => {
+  if (!selectedStudent.value) return
+  useApi({
+    api: classes.DeleteStudent(selectedStudent.value),
+    onSuccess: () => {
+      useStudentList()
+      selectedStudent.value = []
+    },
+    tip: '删除成功'
   })
 }
 

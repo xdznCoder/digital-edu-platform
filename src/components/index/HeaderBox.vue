@@ -1,5 +1,5 @@
 <template>
-  <div class="index-header py-6 px-4 d-flex">
+  <div class="index-header py-6 px-6 d-flex">
     <div class="title text-h6 font-weight-bold text-white">
       数字化智能教学互动平台
     </div>

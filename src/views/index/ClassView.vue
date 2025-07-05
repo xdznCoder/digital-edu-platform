@@ -30,7 +30,7 @@
                 @click:clear="useClassList"
             ></v-text-field>
           </div>
-          <v-btn color="primary" variant="outlined" rounded @click="handleNewClass">添加班级</v-btn>
+          <v-btn color="primary" variant="outlined" rounded @click="overlay = true">添加班级</v-btn>
         </div>
         <ClassCards v-if="classList" :data="classList.list"/>
       </v-tabs-window-item>
@@ -39,7 +39,7 @@
         v-model="overlay"
         class="align-center justify-center"
     >
-      <NewClass @close="overlay = false"/>
+      <NewClass @close="handleClose"/>
     </v-overlay>
   </div>
 </template>
@@ -57,8 +57,9 @@ const overlay = ref<boolean>(false)
 const classList = ref<ApiMap['/class/list']['resp'] | null>(null)
 const keyWord = ref<string>('')
 
-function handleNewClass() {
-  overlay.value = true
+function handleClose() {
+  overlay.value = false
+  useClassList()
 }
 
 onMounted(() => {

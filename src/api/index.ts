@@ -58,5 +58,24 @@ export const classes = {
         method: 'GET',
         data: {cid, pageNum, pageSize, key},
         withToken: true
+    }),
+    DeleteStudent: (ids: Array<number>) => request({
+        url: '/class/student',
+        method: 'DELETE',
+        data: ids,
+        withToken: true
+    }),
+    UploadStudent: (id: number, file: File) => request({
+        url: '/class/upload',
+        method: 'POST',
+        data: {id, file},
+        withToken: true,
+        withFormData: true,
+    }),
+    UploadStudentSingle: (cid: number, sno: string, name: string) => request({
+        url: '/class/upload/single',
+        method: 'POST',
+        data: {cid, sno, name},
+        withToken: true
     })
 }
