@@ -3,7 +3,7 @@ import axios, {AxiosRequestConfig} from "axios";
 import {user} from "@/api/index";
 import store from "@/store";
 
-const BaseURL = 'http://110.41.32.16:8080'
+export const BaseURL = 'http://110.41.32.16:8080'
 
 export async function request<K extends keyof ApiMap>(
     requestConfig: {

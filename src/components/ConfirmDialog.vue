@@ -9,6 +9,7 @@
         <v-btn
             text="确认"
             color="primary"
+            :loading="loading"
             @click="emits('confirm')"
         ></v-btn>
         <v-btn
@@ -25,6 +26,7 @@ import { defineEmits, defineProps } from "vue";
 defineProps<{
   title: string
   text: string
+  loading?: boolean
 }>()
 
 const emits = defineEmits(['confirm', 'cancel'])

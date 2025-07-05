@@ -18,7 +18,7 @@
             @click:append-inner="handleSearch"
             @click:clear="handleSearch"
         ></v-text-field>
-        <v-btn class="ml-4" color="blue-darken-1" rounded @click="showOverlay = true">手动添加学生</v-btn>
+        <v-btn class="mx-4" color="blue-darken-1" rounded @click="showOverlay = true">手动添加学生</v-btn>
       </div>
 
       <div class="d-flex">

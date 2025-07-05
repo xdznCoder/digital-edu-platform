@@ -1,9 +1,10 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
 import IndexView from "@/views/IndexView.vue";
 import LoginView from "@/views/LoginView.vue";
-import ClassView from "@/views/index/ClassView.vue";
+import ClassView from "@/views/ClassView.vue";
 import EmptyView from "@/views/EmptyView.vue";
-import ClassDetail from "@/views/index/ClassDetail.vue";
+import ClassDetail from "@/views/ClassDetail.vue";
+import GameView from "@/views/GameView.vue";
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -20,6 +21,11 @@ const routes: Array<RouteRecordRaw> = [
         path: 'detail',
         name: 'detail',
         component: ClassDetail
+      },
+      {
+        path: 'game',
+        name: 'game',
+        component: GameView
       },
       {
         path: ':childPathMatch(.*)*',

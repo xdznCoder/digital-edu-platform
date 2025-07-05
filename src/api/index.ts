@@ -1,4 +1,5 @@
-import {request} from "@/api/request";
+import {BaseURL, request} from "@/api/request";
+import axios from "axios";
 
 export const user = {
     PasswordLogin: (email: string, password: string) => request({
@@ -76,6 +77,29 @@ export const classes = {
         url: '/class/upload/single',
         method: 'POST',
         data: {cid, sno, name},
+        withToken: true
+    }),
+}
+
+export const team = {
+    DownloadTeamFile: (memberCount: number) => axios.get(BaseURL + '/team/template', {
+        responseType: 'blob',
+        method: 'GET',
+        params: {memberCount},
+    }) as Promise<{data: Blob}>
+}
+
+export const game = {
+    UploadTeam: (file: File, teamNum: number, studentNum: number, teamMemberCount: number, cid: number) => request({
+        url: '/game/upload',
+        method: 'POST',
+        data: {file, teamNum, studentNum, teamMemberCount, cid},
+        withFormData: true,
+    }),
+    GameList: (cid: number) => request({
+        url:'/game/list/:cid',
+        method: 'GET',
+        pathParam: {cid},
         withToken: true
     })
 }

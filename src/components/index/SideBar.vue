@@ -52,7 +52,7 @@ onMounted(() => {
 
 const items = [
   { text: '班级管理', icon: 'mdi-clock', value: 0, path: '/' },
-  { text: '游戏管理', icon: 'mdi-flag', value: 1, path: '/group' },
+  { text: '游戏管理', icon: 'mdi-flag', value: 1, path: '/game' },
   { text: '用户设置', icon: 'mdi-account', value: 2, path: '/user' },
 ]
 </script>
