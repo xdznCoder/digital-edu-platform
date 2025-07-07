@@ -130,5 +130,166 @@ export interface ApiMap {
             gmtCreate: string
             gmtUpdate: string
         }>
+    },
+    '/team/game/:id': {
+        req: {id: number},
+        resp: {
+            teams: Array<{
+                studentId:   number;
+                studentName: string;
+                studentSno:  string;
+                isLeader:   boolean;
+                }>;
+            freeStudents: Array<{
+                teamId:       number;
+                leaderName:   string;
+                leaderId:     number;
+                totalMembers: number;
+                members:      Array<{
+                    studentId:   number;
+                    studentName: string;
+                    studentSno:  string;
+                    isLeader:   boolean;
+                }>;
+                leaderSno:    string;
+            }>;
+        }
+    },
+    '/game/board/init': {
+        req: {
+            gameId:           number
+            totalTiles:       number
+            blackSwampTiles:  number[]
+            blindBoxTiles:    {tileId: number, eventType: number}[]
+            fortressTiles:    {tileId: number,gameType: number}[]
+            goldCenterTiles:  number[]
+            opportunityTiles: number[]
+        }
+        resp: null
+    },
+    '/game/status/:id': {
+        req: {id: number},
+        resp: {
+            id:              number
+            cid:             number
+            studentCount:    number
+            teamCount:       number
+            teamMemberCount: number
+            stage:           number
+            chessRound:      number
+            chessPhase:      number
+            proposalStage:   number
+            proposalRound:   number
+            status:          number
+            lastSavedAt:     string
+            gmtCreate:       string
+            gmtUpdate:       string
+        }
+    },
+    '/game/upload/chess': {
+        req: {gameId: number, file: File},
+        resp: Array<{
+            teamId:         number
+            teamName:       string
+            thisRoundScore: number
+            submitTime:     string
+        }>
+    },
+    '/game/rank/team/:id': {
+        req: {id: number},
+        resp: Array<{
+            teamId:     number
+            leaderName: string
+            totalTile:  number
+            leaderSno:  string
+            totalScore: number
+        }>
+    },
+    '/game/upload/assign': {
+        req: {gameId: number, teamAssignCount: Record<number, number>},
+        resp: null
+    },
+    '/game/xxt/rank/:id': {
+        req: {id: number},
+        resp: Array<{
+            teamId:         number;
+            teamName:       string;
+            thisRoundScore: number;
+            submitTime:     string;
+        }>
+    },
+    '/game/unselected/:gameId': {
+        req: {gameId: number},
+        resp: Array<{
+            teamId:      number
+            leaderName:  string
+            leaderId:    number
+            sno:         string
+            assignCount: number
+        }>
+    },
+    '/game/occupyStatus/:gameId': {
+        req: {gameId: number}
+        resp: {
+            totalTiles:       number
+            blackSwampTiles:  number[]
+            blindBoxTiles:    number[]
+            fortressTiles:    number[]
+            goldCenterTiles:  number[]
+            opportunityTiles: number[]
+            teams:            Array<{
+                teamId:        number
+                occupiedTiles: number[]
+            }>
+        }
+    },
+    '/game/tile/occupy': {
+        req: {
+            gameId: number
+            teamId: number
+            tileIds: number[]
+            triggerBlindBox: boolean
+            blindBoxTileIds: number[]
+            triggerGoldCenter: boolean
+            goldCenterTileId: number
+            triggerChanceLand: boolean
+            chanceLandTileId: number
+            challengeSuccess: boolean
+        }
+        resp: null
+    },
+    '/game/special/list': {
+        req: {gameId: number},
+        resp: Array<{
+            teamId: number
+            unTriggeredTiles: Array<{
+                tileId: number
+                tileType: number
+                eventType: number
+                eventName: string
+            }>
+        }>
+    },
+    '/game/special/blind-box/settle': {
+        req: {
+            gameId: number
+            teamId: number
+            tileId: number
+            eventType: number
+            involvedTeamIds: number[]
+            winnerTeamId: number
+        },
+        resp: null
+    },
+    '/game/special/fortress/settle': {
+        req: {
+            gameId: number
+            tileId: number
+            attackerTeamId: number
+            defenderTeamId: number
+            winnerTeamId: number
+            gameType: number
+        },
+        resp: null
     }
 }

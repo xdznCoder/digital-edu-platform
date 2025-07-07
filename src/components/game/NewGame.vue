@@ -74,6 +74,8 @@
       </div>
       <div class="ml-6 mt-4">
         <v-btn block color="blue-lighten-1" height="40px" @click="showDialog = true">提交</v-btn>
+        <v-btn block color="red-lighten-2" height="40px" class="mt-6" v-if="showGameStart"
+               @click="showDialog = true">确认无误？点此开始游戏</v-btn>
       </div>
     </div>
     <v-overlay v-model="showOverlay" class="align-center justify-center">
@@ -81,10 +83,18 @@
     </v-overlay>
     <v-dialog v-model="showDialog" width="auto">>
       <ConfirmDialog
+          v-if="!showGameStart"
           title="确认提交"
           text="请再次检查Excel表格中学生是否和班级学生匹配"
           :loading="buttonLoading"
           @confirm="handleUpload"
+          @cancel="showDialog = false"
+      />
+      <ConfirmDialog
+          v-if="showGameStart"
+          title="确认开始游戏"
+          text="请再次检查学生分组情况是否正确，一旦开始游戏将无法更改分组"
+          @confirm="handleGameStart"
           @cancel="showDialog = false"
       />
     </v-dialog>
@@ -92,17 +102,21 @@
 </template>
 
 <script lang="ts" setup>
-import {onMounted, ref, defineProps, watch} from "vue";
+import {onMounted, ref, defineProps, watch, defineEmits} from "vue";
 import {ApiMap} from "@/api/type";
 import {useApi} from "@/api/handler";
 import {classes, game, team} from "@/api";
 import DownloadBox from "@/components/game/DownloadBox.vue";
 import ConfirmDialog from "@/components/ConfirmDialog.vue";
 import store from "@/store";
+import {useRouter} from "vue-router";
 
 const props = defineProps<{
   cid?: number
 }>()
+
+const emits = defineEmits(['updateTeamList'])
+const routers = useRouter()
 
 const classList = ref<ApiMap['/class/list']['resp'] | null>(null)
 const selectedClass = ref<number | null>(null)
@@ -113,6 +127,8 @@ const teamNum = ref<number | null>(null)
 const studentNum = ref<number | null>(null)
 const teamBaseNum = ref<number | null>(null)
 const buttonLoading = ref<boolean>(false)
+const showGameStart = ref<boolean>(false)
+const gameId = ref<number | null>(null)
 
 onMounted(() => {
   useClassList()
@@ -125,6 +141,15 @@ watch(() => props.cid, (newCid) => {
 function handleDownload(num: number) {
   useDownloadTeamFile(num)
   showOverlay.value = false
+}
+
+function handleGameStart () {
+  if (!gameId.value) {
+    store.dispatch('snackBarModule/showError', '游戏数据有误，请正确填写')
+    return
+  } else {
+    routers.push({path: '/board', query: {id: gameId.value}})
+  }
 }
 
 function handleUpload () {
@@ -164,7 +189,9 @@ const useUploadTeam = () => {
       api: game.UploadTeam(teamFile.value, teamNum.value, studentNum.value, teamBaseNum.value, props.cid ?? 0 ),
       onSuccess: resp => {
         buttonLoading.value = false
-        console.log(resp.data)
+        gameId.value = (resp.data as ApiMap['/game/upload']['resp']).gameId
+        emits('updateTeamList', gameId.value)
+        showGameStart.value = true
       },
       Finally: () => {showDialog.value = false},
       tip: '上传成功'

@@ -17,29 +17,21 @@
           <ClassSelect @change="handleChange" @submit="handleSelected"/>
         </div>
         <div class="mx-4">
-          <v-empty-state class="mt-12" v-if="!gameList || gameList.length === 0" icon="$error">
-            <template v-slot:media>
-              <v-icon color="surface-variant"></v-icon>
-            </template>
-            <template v-slot:headline>
-              <div class="text-h4">
-                该课程无数据
-              </div>
-            </template>
-            <template v-slot:title>
-              <div class="text-h6">
-                若未选择课程请先点击左上角选择框选择课程，若已选择课程则
-              </div>
-              <div class="text-h6">
-                该课程并无任何游戏保存记录
-              </div>
-            </template>
-          </v-empty-state>
+          <v-empty-state
+              class="mt-12"
+              v-if="!gameList || gameList.length === 0"
+              icon="$error"
+              title="该课程无游戏记录"
+              text="若未选择课程请先点击左上角选择框选择课程，若已选择课程则该课程并无任何游戏保存记录"
+          />
           <GameCards color="green-darken-1" v-if="gameList && gameList.length > 0" :data="gameList" />
         </div>
       </v-tabs-window-item>
       <v-tabs-window-item value="two">
-        <NewGame :cid="classSelected" />
+        <div class="d-flex">
+          <NewGame :cid="classSelected" @update-team-list="handleUpdateTeamList"/>
+          <TeamList ref="TeamListRef"/>
+        </div>
       </v-tabs-window-item>
     </v-tabs-window>
 
@@ -54,10 +46,12 @@ import {ApiMap} from "@/api/type";
 import {useApi} from "@/api/handler";
 import {game} from "@/api";
 import GameCards from "@/components/game/GameCards.vue";
+import TeamList from "@/components/game/TeamList.vue";
 
 const tab = ref<string>('one')
 const classSelected = ref<number | null>(null)
 const gameList = ref<ApiMap['/game/list/:cid']['resp'] | null>(null)
+const TeamListRef = ref<InstanceType<typeof TeamList> | null>(null)
 
 function handleSelected (id: number) {
   classSelected.value = id
@@ -67,6 +61,10 @@ function handleSelected (id: number) {
 function handleChange (id: number) {
   classSelected.value = id
   useGameList()
+}
+
+function handleUpdateTeamList (gameId: number) {
+  TeamListRef.value.useTeamList(gameId)
 }
 
 const useGameList = () => {

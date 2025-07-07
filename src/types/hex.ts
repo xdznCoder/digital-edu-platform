@@ -1,3 +1,6 @@
+import {ApiMap} from "@/api/type";
+import {GameDisplay} from "@/utils";
+
 export class HexGrid {
     hexCols: Array<hexCol>
     radius: number
@@ -6,10 +9,19 @@ export class HexGrid {
         y: number;
         radius: number;
         mode: 'origin' | 'fight-fortress' | 'gold-center' | 'black-swamp' | 'chance-place' | 'secret-place' | 'normal'
+        fill?: string
+        text?: string
     }>
 
     constructor(originX: number, originY: number, radius?: number) {
         this.radius = radius ?? 20
+        this.hexCols = []
+        this.hexArray = []
+        this.render(originX, originY, this.radius)
+    }
+
+    render(originX: number, originY: number, radius: number, tileSets?: ApiMap['/game/occupyStatus/:gameId']['resp'], round?: number) {
+        this.radius = radius
         const width = this.radius * 1.5;
         const height = this.radius * Math.sqrt(3) / 2;
         this.hexCols = [
@@ -50,12 +62,42 @@ export class HexGrid {
                 this.hexArray.push({x: this.hexCols[i].x, y: this.hexCols[i].y + j * this.radius * Math.sqrt(3), radius: this.radius, mode: 'normal'});
             }
         }
+        this.setMode([0, 6, 19, 21, 61, 62, 111, 165, 185, 228, 242, 266, 277, 279, 280, 282], 'origin')
+        if (tileSets) {
+            this.setTotalMode(
+                tileSets.blackSwampTiles,
+                tileSets.fortressTiles,
+                tileSets.opportunityTiles,
+                tileSets.blindBoxTiles,
+                tileSets.goldCenterTiles)
+            if (round && round >= 3) {
+                this.setMode(tileSets.opportunityTiles, 'chance-place')
+            }
+            for (const team of tileSets.teams) {
+                team.occupiedTiles.forEach(tileSet => {
+                    this.setColor(tileSet, GameDisplay.teamColorTrans(team.teamId), team.teamId.toString())
+                })
+            }
+        }
     }
 
     setMode(array: Array<number>, mode: 'origin' | 'fight-fortress' | 'gold-center' | 'black-swamp' | 'chance-place' | 'secret-place') {
         for (let i = 0; i < array.length; i++) {
             this.hexArray[array[i]].mode = mode;
         }
+    }
+
+    setTotalMode(blackSwapTiles: Array<number>,fortressTiles: Array<number>,opportunityTiles: Array<number>,blindBoxTiles: Array<number>,goldCenterTiles: Array<number>) {
+        this.setMode(blackSwapTiles, 'black-swamp')
+        this.setMode(fortressTiles, 'fight-fortress')
+        this.setMode(opportunityTiles, 'black-swamp')
+        this.setMode(blindBoxTiles, 'secret-place')
+        this.setMode(goldCenterTiles, 'gold-center')
+    }
+
+    setColor(id: number,color: string, text?: string) {
+        this.hexArray[id].text = text
+        this.hexArray[id].fill = color
     }
 }
 

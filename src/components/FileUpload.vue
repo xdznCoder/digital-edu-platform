@@ -10,13 +10,17 @@
 
     <v-btn color="primary" variant="outlined" rounded @click="triggerFileInput">
       <v-icon start icon="mdi-upload" />
-      上传学生数据
+      {{ text ?? '上传学生数据' }}
     </v-btn>
   </div>
 </template>
 
 <script setup lang="ts">
-import {ref, defineEmits} from "vue";
+import {ref, defineEmits, defineProps} from "vue";
+
+defineProps<{
+  text?: string
+}>()
 
 const file = ref<File | null>(null)
 const fileInput = ref<HTMLInputElement | null>(null)

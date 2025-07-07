@@ -1,5 +1,6 @@
 import {BaseURL, request} from "@/api/request";
 import axios from "axios";
+import {ApiMap} from "@/api/type";
 
 export const user = {
     PasswordLogin: (email: string, password: string) => request({
@@ -86,7 +87,13 @@ export const team = {
         responseType: 'blob',
         method: 'GET',
         params: {memberCount},
-    }) as Promise<{data: Blob}>
+    }) as Promise<{data: Blob}>,
+    TeamList: (id: number) => request({
+        url: '/team/game/:id',
+        method: "GET",
+        pathParam: {id},
+        withToken: true
+    })
 }
 
 export const game = {
@@ -100,6 +107,79 @@ export const game = {
         url:'/game/list/:cid',
         method: 'GET',
         pathParam: {cid},
+        withToken: true
+    }),
+    InitGame: (gameId: number,totalTiles: number,blackSwampTiles: number[],blindBoxTiles: {tileId: number, eventType: number}[],fortressTiles: {tileId: number,gameType: number}[],goldCenterTiles: number[],opportunityTiles: number[]) => request({
+        url: '/game/board/init',
+        method: 'POST',
+        data: {gameId, totalTiles, blackSwampTiles, blindBoxTiles, fortressTiles, goldCenterTiles, opportunityTiles},
+        withToken: true
+    }),
+    GameStatus: (id: number) => request({
+        url: '/game/status/:id',
+        method: 'GET',
+        pathParam: {id: id},
+        withToken: true
+    }),
+    UploadGrade: (gameId: number, file: File) => request({
+        url: '/game/upload/chess',
+        method: 'POST',
+        data: {gameId, file},
+        withToken: true,
+        withFormData: true,
+    }),
+    TileRank: (id: number) => request({
+        url: '/game/rank/team/:id',
+        method: 'GET',
+        pathParam: {id},
+        withToken: true
+    }),
+    UploadAssign: (gameId: number, teamAssignCount: Record<number, number>) => request({
+        url: '/game/upload/assign',
+        method: 'POST',
+        data: {gameId, teamAssignCount},
+        withToken: true
+    }),
+    GradeRank: (id: number) => request({
+        url: '/game/xxt/rank/:id',
+        method: 'GET',
+        pathParam: {id},
+        withToken: true
+    }),
+    UnselectedList: (gameId: number) => request({
+        url: '/game/unselected/:gameId',
+        method: 'GET',
+        pathParam: {gameId},
+        withToken: true
+    }),
+    TileSets: (gameId: number) => request({
+        url: '/game/occupyStatus/:gameId',
+        method: 'GET',
+        pathParam: {gameId},
+        withToken: true
+    }),
+    TileOccupy: (data: ApiMap['/game/tile/occupy']['req']) => request({
+        url: '/game/tile/occupy',
+        method: 'POST',
+        data: data,
+        withToken: true,
+    }),
+    SpecialList: (gameId: number) => request({
+        url: '/game/special/list',
+        method: 'GET',
+        data: {gameId},
+        withToken: true
+    }),
+    SubmitBlindBox: (data: ApiMap['/game/special/blind-box/settle']['req']) => request({
+        url: '/game/special/blind-box/settle',
+        method: 'POST',
+        data: data,
+        withToken: true
+    }),
+    SubmitFortress: (data: ApiMap['/game/special/fortress/settle']['req']) => request({
+        url: '/game/special/fortress/settle',
+        method: 'POST',
+        data: data,
         withToken: true
     })
 }

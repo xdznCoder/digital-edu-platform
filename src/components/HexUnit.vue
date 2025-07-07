@@ -1,11 +1,21 @@
 <template>
-  <g style="cursor: pointer" @click="emits('onHexClick', props.id)">
+  <g class="hex-unit" style="cursor: pointer" @click="emits('onHexClick', props.id)">
     <polygon
         :points="points"
         :fill="fill ?? getFill()"
         :stroke="stroke"
         :stroke-width="1"
     />
+      <text
+          :x="props.x"
+          :y="props.y"
+          text-anchor="middle"
+          dominant-baseline="middle"
+          :font-size="radius / 1.5"
+          fill="white"
+      >
+        {{ text }}
+      </text>
   </g>
 </template>
 
@@ -19,6 +29,7 @@ interface Props {
   radius: number
   mode?: 'origin' | 'fight-fortress' | 'gold-center' | 'black-swamp' | 'chance-place' | 'secret-place' | 'normal'
   fill?: string
+  text?: string
 }
 
 const emits = defineEmits(['onHexClick'])
@@ -57,6 +68,9 @@ const getFill = () => {
 const stroke = '#333'
 </script>
 
+<style lang="scss" scoped>
+
+</style>
 
 
 

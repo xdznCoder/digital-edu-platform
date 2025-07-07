@@ -5,6 +5,7 @@ import ClassView from "@/views/ClassView.vue";
 import EmptyView from "@/views/EmptyView.vue";
 import ClassDetail from "@/views/ClassDetail.vue";
 import GameView from "@/views/GameView.vue";
+import BoardView from "@/views/BoardView.vue";
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -38,6 +39,11 @@ const routes: Array<RouteRecordRaw> = [
     path: '/login',
     name: 'login',
     component: LoginView
+  },
+  {
+    path: '/board',
+    name: 'board',
+    component: BoardView
   },
   {
     path: '/:pathMatch(.*)*',

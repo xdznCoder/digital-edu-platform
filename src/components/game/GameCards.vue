@@ -16,7 +16,7 @@
             prepend-icon="mdi-equalizer-outline"
             :title="`${value.lastSavedAt} 保存`"
             :color="color ?? 'indigo-lighten-2'"
-            @click="routers.push({path: '/detail', query: {id: value.id}})"
+            @click="routers.push({path: '/board', query: {id: value.id}})"
         >
           <v-card-item>
             <v-card-subtitle>

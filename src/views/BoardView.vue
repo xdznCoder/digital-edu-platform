@@ -1,26 +1,116 @@
 <template>
-  <svg width="2100" height="900" >
-    <Hex v-for="(item, index) of hexGrid.hexArray" :key="index" :x="item.x" :y="item.y" :radius="item.radius" @onHexClick="onHexClick" :id="index" :mode="item.mode"/>
-  </svg>
+  <div class="board-view-container d-flex">
+    <div class="left" style="display: flex; flex-direction: column; ">
+      <v-expansion-panels>
+        <v-expansion-panel class="mt-2">
+          <v-expansion-panel-title class="pa-3">
+            <v-icon icon="mdi-cog" class="mx-4"></v-icon>
+            <span class="text-h6">棋盘设置</span>
+          </v-expansion-panel-title>
+          <v-expansion-panel-text class="pa-2">
+            <div class="d-flex">
+              <div class="mx-2">调整X轴方位</div>
+              <v-slider
+                  v-model="originX"
+                  :max="240"
+                  :min="0"
+                  :step="10"
+                  thumb-label
+              />
+            </div>
+            <div class="d-flex">
+              <div class="mx-2">调整Y轴方位</div>
+              <v-slider
+                  v-model="originY"
+                  :max="240"
+                  :min="0"
+                  :step="10"
+                  thumb-label
+              />
+            </div>
+            <div class="d-flex">
+              <div class="mx-2">调整棋盘大小</div>
+              <v-slider
+                  v-model="radius"
+                  :max="34"
+                  :min="10"
+                  :step="1"
+                  thumb-label
+              />
+            </div>
+          </v-expansion-panel-text>
+        </v-expansion-panel>
+      </v-expansion-panels>
+        <SpecialCard :data="GameStatus" @update="useGameStatus"/>
+        <TileRank :data="GameStatus" />
+    </div>
+      <div style="flex: 2; min-width: 800px">
+      <BoardBox
+          v-if="GameStatus"
+          :data="GameStatus"
+          :origin-x="originX"
+          :origin-y="originY"
+          :radius="radius"
+          @update="useGameStatus"/>
+    </div>
+    <div class="right">
+      <LegendBox />
+      <BoardStatus v-if="GameStatus" :data="GameStatus" @update="useGameStatus"/>
+      <GradeRank v-if="GameStatus" :game-id="gameId" :data="GameStatus" @update="useGameStatus"/>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
-import Hex from '../components/HexUnit.vue'
-import {HexGrid} from "@/types/hex";
+import {useApi} from "@/api/handler";
+import {game} from "@/api";
+import {onMounted, ref} from "vue";
+import {useRoute} from "vue-router";
+import {ApiMap} from "@/api/type";
+import BoardBox from "@/components/board/BoardBox.vue";
+import BoardStatus from "@/components/board/BoardStatus.vue";
+import GradeRank from "@/components/board/GradeRank.vue";
+import TileRank from "@/components/board/TileRank.vue";
+import LegendBox from "@/components/board/LegendBox.vue";
+import SpecialCard from "@/components/board/SpecialCard.vue";
 
-const originX = 200
-const originY = 100
+const GameStatus = ref<ApiMap['/game/status/:id']['resp'] | null>(null)
+const route = useRoute()
+const gameId = ref<number>(0)
 
-const hexGrid: HexGrid = new HexGrid(originX, originY, 22)
+const originX = ref(70)
+const originY = ref(40)
+const radius = ref(24)
 
-hexGrid.setMode([0, 6, 19, 21, 61, 62, 111, 165, 185, 228, 242, 266, 277, 279, 280, 282], 'origin')
-hexGrid.setMode([22, 35, 53, 120, 137, 138, 140, 141, 144, 157, 161, 191, 250, 257], 'black-swamp')
-hexGrid.setMode([51, 56, 219, 224], 'fight-fortress')
-hexGrid.setMode([58], 'chance-place')
-hexGrid.setMode([115, 135, 143, 162], 'secret-place')
-hexGrid.setMode([139], 'gold-center')
+onMounted(() => {
+  gameId.value = Number(route.query.id)
+  useGameStatus()
+})
 
-function onHexClick(id: number) {
-  console.log(id)
+const useGameStatus = () => {
+  useApi({
+    api: game.GameStatus(gameId.value),
+    onSuccess: resp => {
+      GameStatus.value = resp.data as ApiMap['/game/status/:id']['resp']
+    }
+  })
 }
 </script>
+
+<style lang="scss" scoped>
+.board-view-container {
+  background-color: #f4f4f4;
+  min-width: 100vw;
+  min-height: 100vh;
+
+  .left {
+    flex: 1;
+    min-width: 300px;
+  }
+
+  .right {
+    flex: 1;
+    min-width: 400px
+  }
+}
+</style>
