@@ -181,5 +181,51 @@ export const game = {
         method: 'POST',
         data: data,
         withToken: true
+    }),
+    IndividualRank: (id: number) => request({
+        url: '/game/rank/student/:id',
+        method: 'GET',
+        pathParam: {id},
+        withToken: true
+    })
+}
+
+export const proposal = {
+    ProposalInit: (data: ApiMap['/proposal/init']['req']) => request({
+        url: '/proposal/init',
+        method: 'POST',
+        data: data,
+        withToken: true
+    }),
+    SubmitOrder: (data: ApiMap['/proposal/order']['req']) => request({
+        url: '/proposal/order',
+        method: 'POST',
+        data: data,
+        withToken: true
+    }),
+    ProposalList: (gameId: number, round: number) => request({
+        url: '/proposal/list',
+        method: 'GET',
+        data: {gameId, round},
+        withToken: true
+    }),
+    FirstProposal: (data: ApiMap['/proposal/upload/first']['req']) => request({
+        url: '/proposal/upload/first',
+        method: 'POST',
+        data: data,
+        withToken: true
+    }),
+    SubmitVote: (data: ApiMap['/proposal/vote']['req']) => request({
+        url: '/proposal/vote',
+        method: 'POST',
+        data: data,
+        withToken: true
+    }),
+    FirstUploadGrade: (gameId: number, file: File) => request({
+        url: '/proposal/upload/first/xxt',
+        method: 'POST',
+        data: {gameId, file},
+        withToken: true,
+        withFormData: true
     })
 }

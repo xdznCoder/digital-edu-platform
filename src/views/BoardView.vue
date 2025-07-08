@@ -42,7 +42,7 @@
         </v-expansion-panel>
       </v-expansion-panels>
         <SpecialCard :data="GameStatus" @update="useGameStatus"/>
-        <TileRank :data="GameStatus" />
+        <TileRank :data="GameStatus" show-change/>
     </div>
       <div style="flex: 2; min-width: 800px">
       <BoardBox
@@ -64,8 +64,8 @@
 <script setup lang="ts">
 import {useApi} from "@/api/handler";
 import {game} from "@/api";
-import {onMounted, ref} from "vue";
-import {useRoute} from "vue-router";
+import {onMounted, ref, watch} from "vue";
+import {useRoute, useRouter} from "vue-router";
 import {ApiMap} from "@/api/type";
 import BoardBox from "@/components/board/BoardBox.vue";
 import BoardStatus from "@/components/board/BoardStatus.vue";
@@ -77,6 +77,7 @@ import SpecialCard from "@/components/board/SpecialCard.vue";
 const GameStatus = ref<ApiMap['/game/status/:id']['resp'] | null>(null)
 const route = useRoute()
 const gameId = ref<number>(0)
+const router = useRouter()
 
 const originX = ref(70)
 const originY = ref(40)
@@ -85,6 +86,11 @@ const radius = ref(24)
 onMounted(() => {
   gameId.value = Number(route.query.id)
   useGameStatus()
+})
+
+watch(() => GameStatus.value, newVal => {
+  if (!newVal) return
+  if (newVal.stage === 2) router.push({path: '/proposal', query: {id: newVal.id}})
 })
 
 const useGameStatus = () => {

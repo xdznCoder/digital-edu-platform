@@ -1,4 +1,4 @@
-import {blindBoxRandom, fortressRandom, getOriginTileSet} from "@/utils/random";
+import {blindBoxRandom, fortressRandom, getOriginTileSet, splitThree} from "@/utils/random";
 import {colorTrans, displayTrans, teamColorTrans} from "@/utils/display";
 
 export const GameUtils = {
@@ -11,4 +11,8 @@ export const GameDisplay = {
     displayTrans,
     colorTrans,
     teamColorTrans,
+}
+
+export const PropUtils = {
+    splitThree
 }

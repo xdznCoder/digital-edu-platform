@@ -291,5 +291,75 @@ export interface ApiMap {
             gameType: number
         },
         resp: null
+    },
+    '/game/rank/student/:id': {
+        req: {id: number},
+        resp: Array<{
+            studentId: number
+            studentName: string
+            individualScore: number
+            memberSno: string
+            teamId: number
+        }>
+    },
+    '/proposal/init': {
+        req: Array<{
+            teamId: number
+            initialScore: number
+            gameId: number
+        }>
+        resp: null
+    },
+    '/proposal/order': {
+        req: {
+            gameId: number
+            roundTeamIds: number[][]
+        }
+        resp: null
+    },
+    '/proposal/upload/first': {
+        req: {
+            gameId: number
+            num: number
+            proposals: Array<{
+                proposerTeamId: number
+                involvedTeamIds: number[]
+                scoreDistribution: number[]
+            }>
+        }
+        resp: null
+    },
+    '/proposal/list': {
+        req: {gameId: number, round: number},
+        resp: Array<{
+            id: number
+            proposerTeamId: number
+            proposerTeamName: string
+            involvedTeamIds: number[]
+            scoreDistribution: number[]
+            isSelected: boolean
+        }>
+    },
+    '/proposal/vote': {
+        req: {
+            gameId: number
+            round: number
+            votes: Array<{
+                teamId: number
+                score: number
+                proposalId: number
+            }>
+        }
+        resp: null
+    },
+    '/proposal/upload/first/xxt': {
+        req: {gameId: number, file: File},
+        resp: Array<{
+            teamId: number
+            teamName: string
+            thisRoundScore: number
+            submitTime: string
+            eliminated: boolean
+        }>
     }
 }

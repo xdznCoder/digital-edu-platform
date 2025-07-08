@@ -1,5 +1,6 @@
 <template>
-  <div class="legend-container d-flex flex-column px-6 py-4 my-8">
+  <div class="legend-container d-flex flex-column px-6 py-4 my-4">
+    <v-btn prepend-icon="mdi-home" variant="text" width="100" class="font-weight-bold" @click="router.push('/')">{{'返回首页'}}</v-btn>
     <div class="legend-item" v-for="(color, mode) in modeColorMap" :key="mode">
       <div class="color-box" :style="{ backgroundColor: color }" />
       <span class="label font-weight-bold ml-4">{{ modeLabelMap[mode] || mode }}</span>
@@ -8,6 +9,8 @@
 </template>
 
 <script setup lang="ts">
+import router from "@/router";
+
 const modeColorMap = {
   'origin': '#8c8c8c',
   'fight-fortress': '#ff9924',

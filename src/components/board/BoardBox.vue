@@ -20,7 +20,7 @@
     </div>
     <div v-if="GameStatus.chessPhase === 2" class="d-flex justify-space-around px-12 mb-4" style="flex: 1">
         <v-btn width="200" class="font-weight-bold" color="red-lighten-1" @click="handleReset">重置</v-btn>
-        <v-btn width="200" class="font-weight-bold" color="primary" @click="useTileOccupy">提交</v-btn>
+        <v-btn width="200" class="font-weight-bold" color="primary" @click="useTileOccupy">保存</v-btn>
     </div>
   </div>
   <EventTip v-if="et.show" :title="et.title" :duration="et.time"></EventTip>
@@ -74,7 +74,6 @@ let tileSets = reactive<ApiMap['/game/occupyStatus/:gameId']['resp']>({
 })
 
 function onHexClick(id: number) {
-  console.log(tileSets, id)
   if (actionLeft.value === 0) return
   if (tileSets.teams.flat().map(item => item.occupiedTiles).flat().includes(id)) return
   if (tileSets.blackSwampTiles.includes(id)) return
