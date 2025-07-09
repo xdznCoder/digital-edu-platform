@@ -75,16 +75,16 @@ export class HexGrid {
             }
             for (const team of tileSets.teams) {
                 team.occupiedTiles.forEach(tileSet => {
-                //     if (  [
-                //         ...tileSets.fortressTiles,
-                //         ...tileSets.opportunityTiles,
-                //         ...tileSets.blindBoxTiles,
-                //         ...tileSets.goldCenterTiles
-                //     ].includes(tileSet)) {
-                //         this.setColor(tileSet, '', team.teamId.toString())
-                //     }else {
-                //         this.setColor(tileSet, GameDisplay.teamColorTrans(team.teamId), team.teamId.toString())
-                //     }
+                    if (  [
+                        ...tileSets.fortressTiles,
+                        ...tileSets.opportunityTiles,
+                        ...tileSets.blindBoxTiles,
+                        ...tileSets.goldCenterTiles
+                    ].includes(tileSet)) {
+                        this.setColor(tileSet, '', team.teamId.toString())
+                    }else {
+                        this.setColor(tileSet, GameDisplay.teamColorTrans(team.teamId), team.teamId.toString())
+                    }
                   this.setColor(tileSet, GameDisplay.teamColorTrans(team.teamId), team.teamId.toString())
                 })
             }

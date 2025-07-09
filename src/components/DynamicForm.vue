@@ -6,7 +6,7 @@
           v-for="(key, index) in fieldKeys"
           :key="key"
       >
-        <div class="d-flex" v-if="!key.includes('Type') && !key.includes('tile')">
+        <div class="d-flex" v-if="shouldShow(key)">
           <div class="mt-1" style="width: 150px">{{headers?.[index] || key}}</div>
           <v-text-field
               density="compact"
@@ -33,7 +33,12 @@ const props = defineProps<{
   model: Record<string, any>
   headers?: string[]
   title?: string
+  excludedKeys?: string[]
 }>()
+
+const shouldShow = (key: string) => {
+  return !(props.excludedKeys?.some(keyword => key.includes(keyword)))
+}
 
 const emits = defineEmits<{
   (e: 'submit', value: Record<string, any>): void

@@ -215,6 +215,12 @@ export const proposal = {
         data: data,
         withToken: true
     }),
+    SecondProposal: (data: ApiMap['/proposal/upload/second']['req']) => request({
+        url: '/proposal/upload/second',
+        method: 'POST',
+        data: data,
+        withToken: true
+    }),
     SubmitVote: (data: ApiMap['/proposal/vote']['req']) => request({
         url: '/proposal/vote',
         method: 'POST',
@@ -227,5 +233,53 @@ export const proposal = {
         data: {gameId, file},
         withToken: true,
         withFormData: true
+    }),
+    KnockoutTeam: (gameId: number, teamIds: number[]) => request({
+        url: '/proposal/outTeam',
+        method: 'POST',
+        data: {gameId, teamIds},
+        withToken: true
+    }),
+    NeedScoreList: (gameId: number) => request({
+        url: '/proposal/second/need',
+        method: 'GET',
+        data: {gameId},
+        withToken: true
+    }),
+    EvaluateDebate: (data: ApiMap['/proposal/debate/evaluate']['req']) => request({
+        url: '/proposal/debate/evaluate',
+        method: 'POST',
+        data: data,
+        withToken: true
+    }),
+    ThirdProposal: (data: ApiMap['/proposal/upload/third']['req']) => request({
+        url: '/proposal/upload/third',
+        method: 'POST',
+        data: data,
+        withToken: true
+    }),
+    ThirdRank : (gameId: number) => request({
+        url: '/proposal/rank/third',
+        method: 'GET',
+        data: {gameId},
+        withToken: true
+    }),
+    SubmitBuzz: (gameId: number) => request({
+        url: '/proposal/settle',
+        method: 'GET',
+        data: {gameId},
+        withToken: true,
+    }),
+    BuzzSetScore: (data: ApiMap['/proposal/buzzed']['req']) => request({
+        url: '/proposal/buzzed',
+        method: 'POST',
+        data: data,
+        withToken: true
+    }),
+    AllRank: (gameId: number) => request({
+        url: '/proposal/rank/all',
+        method: 'GET',
+        data: {gameId},
+        withToken: true
     })
 }

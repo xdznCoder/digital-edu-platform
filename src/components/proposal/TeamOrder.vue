@@ -73,9 +73,15 @@ const useTileRank = () => {
     api: game.TileRank(props.data.id),
     onSuccess: resp => {
       tileRank.value = resp.data as ApiMap['/game/rank/team/:id']['resp']
-      selectedTeam.value[0] = tileRank.value.map((item: any) => ({teamId: `第 ${item.teamId} 组`, teamLeader: item.leaderName, check: false}))
-      selectedTeam.value[1] = tileRank.value.map((item: any) => ({teamId: `第 ${item.teamId} 组`, teamLeader: item.leaderName, check: false}))
-      selectedTeam.value[2] = tileRank.value.map((item: any) => ({teamId: `第 ${item.teamId} 组`, teamLeader: item.leaderName, check: false}))
+      selectedTeam.value[0] = tileRank.value
+          .sort((a, b) => a.teamId - b.teamId)
+          .map((item: any) => ({teamId: `第 ${item.teamId} 组`, teamLeader: item.leaderName, check: false}))
+      selectedTeam.value[1] = tileRank.value
+          .sort((a, b) => a.teamId - b.teamId)
+          .map((item: any) => ({teamId: `第 ${item.teamId} 组`, teamLeader: item.leaderName, check: false}))
+      selectedTeam.value[2] = tileRank.value
+          .sort((a, b) => a.teamId - b.teamId)
+          .map((item: any) => ({teamId: `第 ${item.teamId} 组`, teamLeader: item.leaderName, check: false}))
     }
   })
 }

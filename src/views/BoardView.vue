@@ -42,7 +42,7 @@
         </v-expansion-panel>
       </v-expansion-panels>
         <SpecialCard :data="GameStatus" @update="useGameStatus"/>
-        <TileRank :data="GameStatus" show-change/>
+        <TileRank max-height="400" :data="GameStatus" show-change/>
     </div>
       <div style="flex: 2; min-width: 800px">
       <BoardBox
@@ -90,7 +90,7 @@ onMounted(() => {
 
 watch(() => GameStatus.value, newVal => {
   if (!newVal) return
-  if (newVal.stage === 2) router.push({path: '/proposal', query: {id: newVal.id}})
+  if (newVal.stage >= 2) router.push({path: '/proposal', query: {id: newVal.id}})
 })
 
 const useGameStatus = () => {

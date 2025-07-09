@@ -22,17 +22,14 @@
              variant="outlined"
              color="primary"
              @click="useSubmitVote">提交投票</v-btn>
+      <v-btn v-if="GameStatus && GameStatus.proposalStage === 4"
+             variant="outlined"
+             color="primary"
+             @click="showOverlay = true">为选中提案打分</v-btn>
     </div>
     <v-card rounded min-height="650" class="ma-4">
       <v-data-table
-          :items="proposalList ? proposalList.map((item: any) => (
-            {
-            '提出提案': `第 ${item.proposerTeamId} 组`,
-            '参与游戏': item.involvedTeamIds.map((i: number) => `第 ${i} 组`).join('，'),
-            '分值分配': item.scoreDistribution.map((i: number) => `${i} 分`).join('，'),
-            '操作':true
-            })) : []"
-          item-value="teamId"
+          :items="GetTableData()"
           hide-default-footer
           no-data-text="请先提交游戏设置"
       >
@@ -69,52 +66,19 @@
                  @click="()=> {showOverlay = true; proposalIndex = index}"
                  variant="text">投票</v-btn>
         </template>
+
+        <!--      eslint-disable-next-line vue/valid-v-slot-->
+        <template v-slot:item.是否被选中="{ value }">
+          <v-chip v-if="GameStatus && GameStatus.proposalStage === 4"
+                  :color="value ? 'green' : 'red'"
+          >{{value ? '选中' : '落选'}}</v-chip>
+        </template>
       </v-data-table>
     </v-card>
   </div>
   <v-overlay v-model="showOverlay" class="align-center justify-center">
-    <v-card v-if="GameStatus && GameStatus.proposalStage === 2" class="pa-8" width="500">
-      <div class="mb-6 text-h6">添加提案</div>
-        <div class="d-flex">
-          <div class="mt-1" style="width: 150px">提出提案的小组</div>
-          <v-select
-              v-model="tempProposerTeamId"
-              :items="teamList ? teamList : []"
-              density="compact"
-              :item-title="(item: any) => item.teamId ? `第 ${item.teamId} 组` : null"
-              item-value="teamId"
-              placeholder="请选择提出提案的小组"
-              variant="outlined"
-          >
-          </v-select>
-        </div>
-        <div class="d-flex">
-          <div class="mt-1" style="width: 150px">参与游戏的小组</div>
-          <v-select
-              v-model="tempInvolvedTeamIds"
-              :items="teamList ? teamList : []"
-              density="compact"
-              :item-title="(item: any) => item.teamId ? `第 ${item.teamId} 组` : null"
-              item-value="teamId"
-              placeholder="请选择参与提案的小组"
-              multiple
-              variant="outlined"
-          ></v-select>
-        </div>
-      <div class="d-flex mb-3">
-        <div class="mt-1" style="width: 150px">分值分配</div>
-        <v-text-field placeholder="请依次填入分值分配"
-                      v-model="tempScore"
-                      variant="outlined"
-                      density="compact"
-                      hint="分值之间请使用英文逗号分隔开"
-        ></v-text-field>
-      </div>
-      <div class="d-flex justify-end">
-        <v-btn class="mr-4" color="primary" @click="handleAdd">添加</v-btn>
-        <v-btn color="red-lighten-2" @click="showOverlay = false">取消</v-btn>
-      </div>
-    </v-card>
+    <SubmitPropTwo v-if="GameStatus && GameStatus.proposalStage === 2"
+                   :list="teamList" @submit="handleSubmitPropTwo" @close="showOverlay = false"/>
     <v-card v-if="GameStatus && GameStatus.proposalStage === 3" class="pa-8" width="600">
       <div class="text-lg-h6 mb-6">请填写投票结果</div>
       <div v-for="(value, index) of voteForm" :key="index">
@@ -123,7 +87,7 @@
           <v-text-field max-width="400"
                         class="mb-6"
                         placeholder="请填写投票结果"
-                        hint="请按从小到大依次填入投票票数，用英文逗号隔开"
+                        hint="请按组号从小到大依次填入投票票数，用英文逗号隔开"
                         density="compact"
                         variant="outlined"
                         v-model="value.data"
@@ -134,6 +98,9 @@
         <v-btn class="mr-4" color="primary" @click="showOverlay = false">确认</v-btn>
       </div>
     </v-card>
+    <DebateScore v-if="GameStatus && GameStatus.proposalStage === 4" :data="GameStatus"
+                 @submit="useEvaluateDebate"
+                 @close="showOverlay = false"/>
   </v-overlay>
 </template>
 
@@ -142,6 +109,8 @@ import {defineProps, defineEmits, ref, watch} from "vue";
 import {ApiMap} from "@/api/type";
 import {useApi} from "@/api/handler";
 import {proposal, team} from "@/api";
+import SubmitPropTwo from "@/components/proposal/vote/SubmitPropTwo.vue";
+import DebateScore from "@/components/proposal/vote/DebateScore.vue";
 import store from "@/store";
 
 const props = defineProps<{
@@ -151,45 +120,37 @@ const emits = defineEmits(['update'])
 const GameStatus = ref<ApiMap['/game/status/:id']['resp'] | null>(null)
 const showOverlay = ref<boolean>(false)
 const teamList = ref<ApiMap['/team/game/:id']['resp']['teams']>([])
-const tempProposerTeamId = ref<number | null>(null)
-const tempInvolvedTeamIds = ref<Array<number> | null>(null)
-const tempScore = ref<string>('')
 const proposalNum = ref<number | null>(null)
 
-const proposalList = ref<ApiMap['/proposal/upload/first']['req']['proposals']>([])
+const proposalList = ref<ApiMap['/proposal/upload/second']['req']['proposals']>([])
 const voteForm = ref<Array<{ data: string, teamId: number }>>([])
 const proposalIndex = ref<number>(0)
 
-function handleAdd() {
-  try {
-    const scoreList = tempScore.value.split(',').map(Number)
-    let temp = 0
-    scoreList.forEach((score: number) => {temp += score})
-    if (!tempInvolvedTeamIds.value || !tempProposerTeamId.value || tempScore.value === '') {
-      store.dispatch('snackBarModule/showError', '请正确填写数据')
-      return
-    }
-    if (temp !== 28) {
-      store.dispatch('snackBarModule/showError', '分值之和不为28')
-      return
-    }
-    if (scoreList.length !== tempInvolvedTeamIds.value.length) {
-      store.dispatch('snackBarModule/showError', '分值与参与小组不匹配')
-      return
-    }
-    proposalList.value.push({
-      proposerTeamId: tempProposerTeamId.value,
-      involvedTeamIds: tempInvolvedTeamIds.value,
-      scoreDistribution: scoreList
-    })
-    tempProposerTeamId.value = null
-    tempInvolvedTeamIds.value = null
-    tempScore.value = ''
-    showOverlay.value = false
-  } catch {
-    store.dispatch('snackBarModule/showError', '请正确填写数据')
-    return
-  }
+function handleSubmitPropTwo(payload: {id: number, pro: number[], con: number[]}) {
+  proposalList.value.push({
+    proposerTeamId: payload.id,
+    proTeamIds: payload.pro,
+    conTeamIds: payload.con,
+  })
+  showOverlay.value = false
+}
+
+function GetTableData () {
+  if (GameStatus.value && GameStatus.value.proposalStage === 4)
+    return proposalList.value ? proposalList.value.map((item: any) => (
+        {
+          '提出提案': `第 ${item.proposerTeamId} 组`,
+          '正方小组': item.proTeamIds.map((i: number) => `第 ${i} 组`).join('，'),
+          '反方小组': item.conTeamIds.map((i: number) => `第 ${i} 组`).join('，'),
+          '是否被选中': item.isSelected
+        })) : []
+  else return proposalList.value ? proposalList.value.map((item: any) => (
+      {
+        '提出提案': `第 ${item.proposerTeamId} 组`,
+        '正方小组': item.proTeamIds.map((i: number) => `第 ${i} 组`).join('，'),
+        '反方小组': item.conTeamIds.map((i: number) => `第 ${i} 组`).join('，'),
+        '操作': true
+      })) : []
 }
 
 const useProposalList = () => {
@@ -198,10 +159,17 @@ const useProposalList = () => {
   useApi({
     api: proposal.ProposalList(GameStatus.value.id, GameStatus.value.proposalRound),
     onSuccess: resp => {
-      proposalList.value = resp.data as ApiMap['/proposal/list']['resp']
+      const tempList = resp.data as ApiMap['/proposal/list']['resp']
+      proposalList.value = tempList.map(item => ({
+        id: item.id,
+        isSelected: item.isSelected,
+        proposerTeamId: item.proposerTeamId,
+        proTeamIds: item.involvedTeamIds.slice(0, Math.floor(item.involvedTeamIds.length / 2)),
+        conTeamIds: item.involvedTeamIds.slice(Math.floor(item.involvedTeamIds.length / 2))
+      }))
       voteForm.value = proposalList.value.map(item => ({
-       data: '',
-       teamId: item.proposerTeamId
+        data: '',
+        teamId: item.proposerTeamId
       }))
     }
   })
@@ -218,8 +186,12 @@ const useTeamList = () => {
 }
 
 const useSubmitProposal = () => {
+  if (!proposalNum.value) {
+    store.dispatch('snackBarModule/showError', '请填写参与的小组个数')
+    return
+  }
   useApi({
-    api: proposal.FirstProposal({
+    api: proposal.SecondProposal({
       gameId: GameStatus.value!.id,
       num: Number(proposalNum.value) ?? 0,
       proposals: proposalList.value
@@ -229,6 +201,23 @@ const useSubmitProposal = () => {
   })
 }
 
+const useEvaluateDebate = (data: {
+  teacherScorePro: number
+  teacherScoreCon: number
+  studentScores: {
+    fromTeamId: number
+    scorePro: number
+    scoreCon: number
+  }[]}) => {
+  useApi({
+        api: proposal.EvaluateDebate({...data, gameId: GameStatus.value!.id,
+          proposalId: (proposalList.value as any)?.find((item: any) => item.isSelected).id}),
+        onSuccess: () => {emits('update')},
+        tip: '评分成功'
+  },
+  )
+}
+
 const useSubmitVote = () => {
   let votesList: ApiMap['/proposal/vote']['req']['votes'] = []
   voteForm.value.map(item => {
@@ -236,7 +225,8 @@ const useSubmitVote = () => {
       votesList.push({
         teamId: i + 1,
         score: Number(v),
-        proposalId: (proposalList.value as ApiMap['/proposal/list']['resp']).filter(i => i.proposerTeamId === item.teamId)[0].id
+        proposalId: (proposalList.value as Array<{id: number, proposerTeamId: number, proTeamIds: number[], conTeamIds: number[]}>)
+            .filter(i => i.proposerTeamId === item.teamId)[0].id
       })
     })
   })

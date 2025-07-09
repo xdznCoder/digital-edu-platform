@@ -1,19 +1,34 @@
 <template>
-  <div>
-    <FileUpload @upload="useFirstUpload" />
-    <v-data-table :items="gradeList ?? []">
-      <!--      eslint-disable-next-line vue/valid-v-slot-->
-      <template v-slot:item.eliminated="{ value, index }">
-        <v-icon
-            v-if="!value.eliminated"
-            color="medium-emphasis"
-            icon="mdi-delete"
-            size="small"
-            @click="proposalList.splice(index, 1)">
-        </v-icon>
-        <v-btn v-if="value.eliminated">已淘汰</v-btn>
-      </template>
-    </v-data-table>
+  <div class="knockout-container">
+    <div class="py-6 px-8 d-flex justify-space-between">
+      <div class="text-h5 text-indigo-lighten-2">第一轮提案 淘汰赛</div>
+      <div class="d-flex">
+        <FileUpload @upload="useFirstUpload" />
+        <v-btn class="ml-4" color="red-lighten-2" @click="useKnockoutTeam">淘汰选中</v-btn>
+      </div>
+    </div>
+    <v-card class="mx-4">
+      <div class="py-4 d-flex text-h6 justify-center bg-indigo-lighten-2">学习通答题情况</div>
+      <v-data-table :items="gradeList ?? []"
+                    height="600"
+                    :headers="headers"
+                    show-select
+                    item-value="teamId"
+                    hide-default-footer
+                    v-model="selectedTeam"
+                    no-data-text="请先传入学习通数据"
+      >
+        <!-- eslint-disable-next-line vue/valid-v-slot -->
+        <template v-slot:item.eliminated ="{ value }">
+          <v-chip :color="value ? 'red' : 'green'">{{value ? '已淘汰' : '未淘汰'}}</v-chip>
+        </template>
+
+        <!-- eslint-disable-next-line vue/valid-v-slot -->
+        <template v-slot:item.teamId ="{ value }">
+          <div>第 {{value}} 组</div>
+        </template>
+      </v-data-table>
+    </v-card>
   </div>
 </template>
 
@@ -30,6 +45,14 @@ const props = defineProps<{
 const emits = defineEmits(['update'])
 const GameStatus = ref<ApiMap['/game/status/:id']['resp'] | null>(null)
 const gradeList = ref<ApiMap['/proposal/upload/first/xxt']['resp'] | null>(null)
+const selectedTeam = ref<Array<number>>([])
+const headers = [
+    {title: '组号', value: 'teamId'},
+    {title: '组长', value: 'teamName'},
+    {title: '本回合分数', value: 'thisRoundScore'},
+    {title: '提交时间', value: 'submitTime'},
+    {title: '淘汰', value: 'eliminated'},
+]
 
 const useFirstUpload = (file: File) => {
   useApi({
@@ -42,11 +65,21 @@ const useFirstUpload = (file: File) => {
   })
 }
 
+const useKnockoutTeam = () => {
+  useApi({
+    api: proposal.KnockoutTeam(GameStatus.value!.id, selectedTeam.value),
+    onSuccess: resp => {
+      if (!gradeList.value) return
+      gradeList.value.forEach((v, i) => {
+        if (selectedTeam.value.includes(v.teamId)) v.eliminated = true
+      })
+      selectedTeam.value = []
+    },
+    tip: '淘汰成功'
+  })
+}
+
 watch(() => props.data, () => {
   GameStatus.value = props.data ?? null
 }, {immediate: true})
 </script>
-
-<style scoped lang="scss">
-
-</style>

@@ -3,20 +3,30 @@
     <div class="title text-h6 font-weight-bold text-white">
       数字化智能教学互动平台
     </div>
-    <v-btn prepend-icon="mdi-home"
-           variant="text"
-           class="mr-4 btn"
-           color="white"
-           @click="router.push('/')"
-    >
-      返回首页
-    </v-btn>
+    <div>
+      <v-btn prepend-icon="mdi-chart-bar"
+          class="mr-6 btn"
+             color="white"
+             variant="text"
+             @click="emits('showOverlay')"
+      >查看排行</v-btn>
+      <v-btn prepend-icon="mdi-home"
+             variant="text"
+             class="mr-4 btn"
+             color="white"
+             @click="router.push('/')"
+      >
+        返回首页
+      </v-btn>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import {useRouter} from "vue-router";
+import {defineEmits} from "vue"
 
+const emits = defineEmits(['showOverlay'])
 const router = useRouter()
 </script>
 

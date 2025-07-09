@@ -30,7 +30,7 @@
 
       <v-divider class="my-2" />
 
-      <div class="pa-4">
+      <div v-if="GameStatus && GameStatus.status !== 2" class="pa-4">
         <div class="ma-2">提案阶段：
           <v-chip color="orange" text-color="white" class="mb-1">
             {{ propStage[GameStatus.proposalStage] }}
@@ -39,7 +39,7 @@
 
         <div class="ma-2">提案赛轮次：
           <v-chip color="red-lighten-1" text-color="white" class="mb-1">
-            第 {{ GameStatus.proposalRound }} 组
+            第 {{ GameStatus.proposalRound }} 轮
           </v-chip>
         </div>
 
@@ -47,6 +47,18 @@
           <v-chip v-for="(v, i) of proposalTeam" density="compact" :key="i" class="ma-1">
             第 {{ v.proposerTeamId }} 组
           </v-chip>
+        </div>
+
+        <div v-if="proposalTeam?.filter((item: any) => item.isSelected).length !== 0" class="ma-2">提案中选小组：
+          <v-chip v-for="(v, i) of proposalTeam.filter((item: any) => item.isSelected)" color="indigo" :key="i" class="ma-1">
+            第 {{ v.proposerTeamId }} 组
+          </v-chip>
+        </div>
+      </div>
+
+      <div v-if="GameStatus && GameStatus.status === 2" class="pa-4">
+        <div class="ma-2" v-if="proposalTeam">游戏阶段：
+          <v-chip class="mb-1" color="red">已结束</v-chip>
         </div>
       </div>
 
@@ -85,9 +97,9 @@ const useProposalList = () => {
   })
 }
 
-watch(() => props.data, () => {
-  GameStatus.value = props.data ?? null
-  useProposalList()
+watch(() => props.data, newVal => {
+  GameStatus.value = newVal ?? null
+  if (GameStatus.value && GameStatus.value.status !== 2) useProposalList()
 }, {immediate: true})
 </script>
 

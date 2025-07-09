@@ -38,6 +38,7 @@ function handleFileChange(event: Event) {
     file.value = selectedFile
     emits('upload', selectedFile)
   }
+  target.value = ''
 }
 </script>
 

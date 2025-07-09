@@ -18,7 +18,12 @@
         </tr>
         </thead>
         <tbody>
-        <tr v-for="(item, index) in sortedTeamData" :key="item.teamId">
+        <tr
+            v-for="(item, index) in sortedTeamData"
+            :key="item.teamId"
+            @click="emits('click',{mode, item, index})"
+            style="cursor: pointer"
+        >
           <td>
             <v-chip
                 v-if="index < 3"
@@ -54,7 +59,10 @@
         </tr>
         </thead>
         <tbody>
-        <tr v-for="(item, index) in sortedIndividualData" :key="item.studentId">
+        <tr v-for="(item, index) in sortedIndividualData"
+            :key="item.studentId"
+            @click="emits('click',{mode, item, index})"
+            style="cursor: pointer">
           <td>
             <v-chip
                 v-if="index < 3"
@@ -81,7 +89,7 @@
 </template>
 
 <script setup lang="ts">
-import {ref, computed, defineProps, onMounted, watch} from 'vue'
+import {ref, computed, defineProps, onMounted, watch, defineEmits} from 'vue'
 import {ApiMap} from "@/api/type";
 import {game} from "@/api";
 import {useApi} from "@/api/handler";
@@ -93,7 +101,7 @@ const props = defineProps<{
 }>()
 
 const mode = ref(true) // true = team, false = individual
-
+const emits = defineEmits(['click'])
 const tileRank = ref<ApiMap['/game/rank/team/:id']['resp']>([])
 const individualRank = ref<ApiMap['/game/rank/student/:id']['resp']>([])
 

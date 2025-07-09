@@ -361,5 +361,81 @@ export interface ApiMap {
             submitTime: string
             eliminated: boolean
         }>
+    },
+    '/proposal/upload/second': {
+        req: {
+            gameId: number
+            num: number
+            proposals: {
+                proposerTeamId: number
+                proTeamIds: number[]
+                conTeamIds: number[]
+            }[]
+        }
+        resp: null
+    },
+    '/proposal/outTeam': {
+        req: {gameId: number, teamIds: number[]},
+        resp: {triggered: boolean}
+    },
+    '/proposal/second/need': {
+        req: {gameId: number},
+        resp: Array<number>
+    },
+    '/proposal/debate/evaluate': {
+        req: {
+            gameId: number
+            proposalId: number
+            teacherScorePro: number
+            teacherScoreCon: number
+            studentScores: {
+                fromTeamId: number
+                scorePro: number
+                scoreCon: number
+            }[]
+        },
+        resp: null
+    },
+    '/proposal/upload/third': {
+        req: {
+            gameId: number
+            num: number
+            proposals: {
+                proposerTeamId: number
+                involvedTeamIds: number[]
+            }[]
+        }
+        resp: null
+    },
+    '/proposal/rank/third': {
+        req: {gameId: number},
+        resp: Array<{
+            teamId: number
+            leaderName: string
+            score: number
+            rank: number
+        }>
+    },
+    '/proposal/settle': {
+        req: {gameId: number},
+        resp: null
+    },
+    '/proposal/buzzed': {
+        req: {
+            gameId: number,
+            teamId: number,
+            score: number,
+            comment: string
+        },
+        resp: null
+    },
+    '/proposal/rank/all': {
+        req: {gameId: number},
+        resp: Array<{
+            teamId: number
+            score: number
+            rank: number
+            name: string
+        }>
     }
 }

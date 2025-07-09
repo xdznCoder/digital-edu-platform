@@ -25,10 +25,12 @@
   <v-overlay v-model="submitObject.showOverlay"
              class="align-center justify-center">
     <DynamicForm v-if="submitObject.type === 1" :headers="['小组号', '参加队伍二', '参加队伍三', '获胜方编号', 'ID', '事件类型']"
+                 :excluded-keys="['Type', 'tileId']"
                  :model="submitObject.data"
                  @submit="useSubmitBlindBox"
                  @close="submitObject.showOverlay = false"/>
     <DynamicForm v-if="submitObject.type === 2" :headers="['进攻方', '防守方', '获胜方编号', '事件类型', 'ID' ]"
+                 :excluded-keys="['Type', 'tileId']"
                  :model="submitObject.data"
                  @submit="useSubmitFortress"
                  @close="submitObject.showOverlay = false"/>
