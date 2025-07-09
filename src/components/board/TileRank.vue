@@ -1,13 +1,21 @@
 <template>
   <v-card rounded :max-height="maxHeight ?? 400">
     <div class="text-lg-h6 px-4 py-2 bg-indigo-lighten-2 d-flex justify-space-between align-center">
-      <span>{{ mode ? '占领格子数排行榜' : '个人积分排行榜' }}</span>
-      <v-btn size="small" @click="mode = !mode" class="text-caption" color="white" variant="tonal" v-if="showChange">
+      <span>{{ computedMode ? '占领格子数排行榜' : '个人积分排行榜' }}</span>
+      <v-btn
+          size="small"
+          @click="internalMode = !internalMode"
+          class="text-caption"
+          color="white"
+          variant="tonal"
+          v-if="!isLocked && showChange"
+      >
         切换
       </v-btn>
     </div>
 
-    <div v-if="mode && tileRank" class="ml-2" :style="`overflow-y: auto; height: ${maxHeight - 50}px`">
+    <!-- 团队排行榜 -->
+    <div v-if="computedMode && tileRank" class="ml-2" :style="`overflow-y: auto; height: ${maxHeight - 50}px`">
       <v-table density="compact" class="rounded">
         <thead>
         <tr>
@@ -21,7 +29,7 @@
         <tr
             v-for="(item, index) in sortedTeamData"
             :key="item.teamId"
-            @click="emits('click',{mode, item, index})"
+            @click="emits('click', { mode: 'team', item, index })"
             style="cursor: pointer"
         >
           <td>
@@ -46,8 +54,8 @@
       </v-table>
     </div>
 
-    <!-- 个人排行榜 -->
-    <div v-if="!mode && individualRank" class="ml-2" :style="`overflow-y: auto; height: ${maxHeight - 50}px`">
+    <!-- 学生排行榜 -->
+    <div v-if="!computedMode && individualRank" class="ml-2" :style="`overflow-y: auto; height: ${maxHeight - 50}px`">
       <v-table density="compact" class="rounded">
         <thead>
         <tr>
@@ -59,10 +67,12 @@
         </tr>
         </thead>
         <tbody>
-        <tr v-for="(item, index) in sortedIndividualData"
+        <tr
+            v-for="(item, index) in sortedIndividualData"
             :key="item.studentId"
-            @click="emits('click',{mode, item, index})"
-            style="cursor: pointer">
+            @click="emits('click', { mode: 'student', item, index })"
+            style="cursor: pointer"
+        >
           <td>
             <v-chip
                 v-if="index < 3"
@@ -89,29 +99,39 @@
 </template>
 
 <script setup lang="ts">
-import {ref, computed, defineProps, onMounted, watch, defineEmits} from 'vue'
-import {ApiMap} from "@/api/type";
-import {game} from "@/api";
-import {useApi} from "@/api/handler";
+import {ref, computed, defineProps, defineEmits, onMounted, watch} from 'vue'
+import {ApiMap} from '@/api/type'
+import {game} from '@/api'
+import {useApi} from '@/api/handler'
 
 const props = defineProps<{
   data: ApiMap['/game/status/:id']['resp']
   maxHeight?: number
   showChange?: boolean
+  mode?: 'team' | 'student'
 }>()
 
-const mode = ref(true) // true = team, false = individual
-const emits = defineEmits(['click'])
+const emits = defineEmits<{
+  (e: 'click', payload: { mode: 'team' | 'student', item: any, index: number }): void
+}>()
+
+const internalMode = ref(true) // 默认展示 team
+const isLocked = computed(() => props.mode !== undefined)
+const computedMode = computed(() =>
+    props.mode === 'team' ? true :
+        props.mode === 'student' ? false :
+            internalMode.value
+)
+
 const tileRank = ref<ApiMap['/game/rank/team/:id']['resp']>([])
 const individualRank = ref<ApiMap['/game/rank/student/:id']['resp']>([])
 
 const rankColors = ['amber darken-2', 'blue-grey lighten-1', 'deep-orange lighten-1']
 
 const sortedTeamData = computed(() =>
-    [...tileRank.value].sort((a, b) => {
-      if (b.totalTile !== a.totalTile) return b.totalTile - a.totalTile
-      return b.totalScore - a.totalScore
-    })
+    [...tileRank.value].sort((a, b) =>
+        b.totalTile !== a.totalTile ? b.totalTile - a.totalTile : b.totalScore - a.totalScore
+    )
 )
 
 const sortedIndividualData = computed(() =>
@@ -119,13 +139,13 @@ const sortedIndividualData = computed(() =>
 )
 
 watch(() => props.data, () => loadRankData())
-watch(mode, () => loadRankData())
+watch(computedMode, () => loadRankData())
 
 onMounted(() => loadRankData())
 
 function loadRankData() {
   if (!props.data) return
-  if (mode.value) {
+  if (computedMode.value) {
     useApi({
       api: game.TileRank(props.data.id),
       onSuccess: resp => {

@@ -283,3 +283,18 @@ export const proposal = {
         withToken: true
     })
 }
+
+export const log = {
+    StudentLog: (data: ApiMap['/log/student/list']['req']) => request({
+        url: '/log/student/list',
+        method: 'GET',
+        data: data,
+        withToken: true
+    }),
+    TeamLog: (data: ApiMap['/log/team/list']['req']) => request({
+        url: '/log/team/list',
+        method: 'GET',
+        data: data,
+        withToken: true
+    })
+}

@@ -437,5 +437,61 @@ export interface ApiMap {
             rank: number
             name: string
         }>
+    },
+    '/log/student/list': {
+        req: {
+            gameId: number
+            studentId: number
+            pageNum: number
+            pageSize: number
+        }
+        resp: {
+            list: {
+                id: number
+                studentId: number
+                teamId: number
+                gameId: number
+                score: number
+                reason: number
+                round: number
+                phase: number
+                gmtCreate: string
+                comment: string
+            }[]
+            total: number
+            current: number
+            size: number
+            sizes: number
+        }
+    },
+    '/log/team/list': {
+        req: {
+            gameId: number
+            teamId: number
+            pageNum: number
+            pageSize: number
+        }
+        resp: {
+            list: {
+                id: number
+                teamId: number
+                gameId: number
+                score: number
+                reason: number
+                round: number
+                phase: number
+                gmtCreate: string
+                submitTime: string
+                comment: string
+            }[]
+            total: number
+            current: number
+            size: number
+            sizes: number
+        }
+    },
+    '/log/stream': {
+        req: {sno: number, gameId: number, message: string, type: string},
+        resp: string
     }
 }
