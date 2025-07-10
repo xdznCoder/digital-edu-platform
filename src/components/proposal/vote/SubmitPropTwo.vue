@@ -4,6 +4,7 @@
 <div class="d-flex">
   <div class="mt-1" style="width: 150px">提出提案的小组</div>
   <v-select
+      disabled
       v-model="tempProposerTeamId"
       :items="list ? list : []"
       density="compact"
@@ -41,7 +42,7 @@
     ></v-select>
   </div>
 <div class="d-flex justify-end">
-  <v-btn class="mr-4" color="primary" @click="handleAdd">添加</v-btn>
+  <v-btn class="mr-4" color="primary" @click="handleEdit">确认</v-btn>
   <v-btn color="red-lighten-2" @click="emits('close')">取消</v-btn>
 </div>
 </v-card>
@@ -52,32 +53,27 @@ import {defineProps, defineEmits, ref} from "vue";
 import {ApiMap} from "@/api/type";
 import store from "@/store";
 
-defineProps<{
+const props = defineProps<{
   list: ApiMap['/team/game/:id']['resp']['teams']
+  team: {proposerTeamId: number}
 }>()
 const emits = defineEmits<{
   (e: 'submit', payload: {id: number, pro: number[], con: number[]}): void
   (e: 'close'): void
 }>()
 
-const tempProposerTeamId = ref<number | null>(null)
+const tempProposerTeamId = ref<number>(props.team.proposerTeamId)
 const tempProIds = ref<Array<number> | null>(null)
 const tempConIds = ref<Array<number> | null>(null)
 
-function handleAdd() {
-  try {
+function handleEdit() {
     if (!tempConIds.value || !tempProposerTeamId.value || !tempProIds.value) {
       store.dispatch('snackBarModule/showError', '请正确填写数据')
       return
     }
     emits('submit',{id: tempProposerTeamId.value, pro: tempProIds.value, con: tempConIds.value })
-    tempProposerTeamId.value = null
     tempProIds.value = null
     tempConIds.value = null
     emits('close')
-  } catch {
-    store.dispatch('snackBarModule/showError', '请正确填写数据')
-    return
-  }
 }
 </script>

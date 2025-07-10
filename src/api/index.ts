@@ -27,7 +27,13 @@ export const user = {
         const info = window.localStorage.getItem('user')
         if (!info) return null
         return JSON.parse(info) as { id: string, username: string, nickname: string, avatar: string, type: number, token: string }
-    }
+    },
+    UpdateUser: (data: ApiMap['/user/update']['req']) => request({
+        url: '/user/update',
+        method: 'PUT',
+        data: data,
+        withToken: true
+    })
 }
 
 export const classes = {

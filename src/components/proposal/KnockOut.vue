@@ -19,8 +19,8 @@
                     no-data-text="请先传入学习通数据"
       >
         <!-- eslint-disable-next-line vue/valid-v-slot -->
-        <template v-slot:item.eliminated ="{ value }">
-          <v-chip :color="value ? 'red' : 'green'">{{value ? '已淘汰' : '未淘汰'}}</v-chip>
+        <template v-slot:item.status ="{ value }">
+          <v-chip :color="colorMap[value + 1]">{{statusMap[value + 1]}}</v-chip>
         </template>
 
         <!-- eslint-disable-next-line vue/valid-v-slot -->
@@ -51,8 +51,10 @@ const headers = [
     {title: '组长', value: 'teamName'},
     {title: '本回合分数', value: 'thisRoundScore'},
     {title: '提交时间', value: 'submitTime'},
-    {title: '淘汰', value: 'eliminated'},
+    {title: '淘汰', value: 'status'},
 ]
+const statusMap = ['未参赛', '已淘汰', '未淘汰']
+const colorMap = ['', 'red', 'green']
 
 const useFirstUpload = (file: File) => {
   useApi({
@@ -71,9 +73,10 @@ const useKnockoutTeam = () => {
     onSuccess: resp => {
       if (!gradeList.value) return
       gradeList.value.forEach((v, i) => {
-        if (selectedTeam.value.includes(v.teamId)) v.eliminated = true
+        if (selectedTeam.value.includes(v.teamId)) v.status = 0
       })
       selectedTeam.value = []
+      emits('update')
     },
     tip: '淘汰成功'
   })

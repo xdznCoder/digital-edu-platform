@@ -74,7 +74,6 @@ function sendMessage() {
   const es = new EventSource(BaseURL + '/log/stream?' + params.toString())
 
   es.onmessage = (event) => {
-    console.log(event.data)
     messages.value[messages.value.length - 1].text += event.data
   }
 

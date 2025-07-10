@@ -7,6 +7,7 @@ import ClassDetail from "@/views/ClassDetail.vue";
 import GameView from "@/views/GameView.vue";
 import BoardView from "@/views/BoardView.vue";
 import ProposalView from "@/views/ProposalView.vue";
+import UserView from "@/views/UserView.vue";
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -28,6 +29,11 @@ const routes: Array<RouteRecordRaw> = [
         path: 'game',
         name: 'game',
         component: GameView
+      },
+      {
+        path: '/user',
+        name: 'user',
+        component: UserView
       },
       {
         path: ':childPathMatch(.*)*',

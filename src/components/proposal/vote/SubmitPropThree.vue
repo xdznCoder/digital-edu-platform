@@ -4,6 +4,7 @@
     <div class="d-flex">
       <div class="mt-1" style="width: 150px">提出提案的小组</div>
       <v-select
+          disabled
           v-model="tempProposerTeamId"
           :items="list ? list : []"
           density="compact"
@@ -28,7 +29,7 @@
       ></v-select>
     </div>
     <div class="d-flex justify-end">
-      <v-btn class="mr-4" color="primary" @click="handleAdd">添加</v-btn>
+      <v-btn class="mr-4" color="primary" @click="handleEdit">确认</v-btn>
       <v-btn color="red-lighten-2" @click="emits('close')">取消</v-btn>
     </div>
   </v-card>
@@ -39,7 +40,8 @@ import {defineProps, defineEmits, ref} from "vue";
 import {ApiMap} from "@/api/type";
 import store from "@/store";
 
-defineProps<{
+const props = defineProps<{
+  team: {proposerTeamId: number}
   list: ApiMap['/team/game/:id']['resp']['teams']
 }>()
 const emits = defineEmits<{
@@ -47,16 +49,15 @@ const emits = defineEmits<{
   (e: 'close'): void
 }>()
 
-const tempProposerTeamId = ref<number | null>(null)
+const tempProposerTeamId = ref<number>(props.team.proposerTeamId)
 const tempInvolvedTeamIds = ref<Array<number> | null>(null)
 
-function handleAdd() {
+function handleEdit() {
     if (!tempInvolvedTeamIds.value || !tempProposerTeamId.value) {
       store.dispatch('snackBarModule/showError', '请正确填写数据')
       return
     }
     emits('submit',{id: tempProposerTeamId.value, ids: tempInvolvedTeamIds.value })
-    tempProposerTeamId.value = null
     tempInvolvedTeamIds.value = null
     emits('close')
 }

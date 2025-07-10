@@ -359,7 +359,7 @@ export interface ApiMap {
             teamName: string
             thisRoundScore: number
             submitTime: string
-            eliminated: boolean
+            status: number
         }>
     },
     '/proposal/upload/second': {
@@ -493,5 +493,14 @@ export interface ApiMap {
     '/log/stream': {
         req: {sno: number, gameId: number, message: string, type: string},
         resp: string
+    },
+    '/user/update': {
+        req: {
+            id: number
+            username: string
+            nickname: string
+            avatar: string
+        },
+        resp: null
     }
 }

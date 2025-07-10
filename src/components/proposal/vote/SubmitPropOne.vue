@@ -4,6 +4,7 @@
     <div class="d-flex">
       <div class="mt-1" style="width: 150px">提出提案的小组</div>
       <v-select
+          disabled
           v-model="tempProposerTeamId"
           :items="list ? list : []"
           density="compact"
@@ -37,7 +38,7 @@
       ></v-text-field>
     </div>
     <div class="d-flex justify-end">
-      <v-btn class="mr-4" color="primary" @click="handleAdd">添加</v-btn>
+      <v-btn class="mr-4" color="primary" @click="handleEdit">确认</v-btn>
       <v-btn color="red-lighten-2" @click="emits('close')">取消</v-btn>
     </div>
   </v-card>
@@ -48,7 +49,8 @@ import {defineProps, defineEmits, ref} from "vue";
 import {ApiMap} from "@/api/type";
 import store from "@/store";
 
-defineProps<{
+const props = defineProps<{
+  team: {proposerTeamId: number}
   list: ApiMap['/team/game/:id']['resp']['teams']
 }>()
 const emits = defineEmits<{
@@ -56,11 +58,11 @@ const emits = defineEmits<{
   (e: 'close'): void
 }>()
 
-const tempProposerTeamId = ref<number | null>(null)
+const tempProposerTeamId = ref<number>(props.team.proposerTeamId)
 const tempInvolvedTeamIds = ref<Array<number> | null>(null)
 const tempScore = ref<string>('')
 
-function handleAdd() {
+function handleEdit() {
   try {
     const scoreList = tempScore.value.split(',').map(Number)
     let temp = 0
@@ -78,7 +80,6 @@ function handleAdd() {
       return
     }
     emits('submit',{id: tempProposerTeamId.value, ids: tempInvolvedTeamIds.value, score: scoreList })
-    tempProposerTeamId.value = null
     tempInvolvedTeamIds.value = null
     tempScore.value = ''
     emits('close')

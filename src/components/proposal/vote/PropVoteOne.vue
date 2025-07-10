@@ -41,15 +41,6 @@
               <v-icon color="medium-emphasis" icon="mdi-book-multiple" size="x-small" start></v-icon>
               提案列表
             </v-toolbar-title>
-            <v-btn
-                v-if="GameStatus && GameStatus.proposalStage === 2"
-                class="me-2"
-                prepend-icon="mdi-plus"
-                rounded="lg"
-                text="添加"
-                border
-                @click="showOverlay = true"
-            ></v-btn>
           </v-toolbar>
         </template>
 
@@ -58,9 +49,9 @@
           <v-icon
               v-if="GameStatus && GameStatus.proposalStage === 2"
               color="medium-emphasis"
-              icon="mdi-delete"
+              icon="mdi-pencil"
               size="small"
-              @click="proposalList.splice(index, 1)">
+              @click="handleEditProp(index)">
           </v-icon>
           <v-btn v-if="GameStatus && GameStatus.proposalStage === 3"
                  class="px-2"
@@ -73,6 +64,7 @@
   </div>
   <v-overlay v-model="showOverlay" class="align-center justify-center">
     <SubmitPropOne v-if="GameStatus && GameStatus.proposalStage === 2"
+                   :team="proposalList[proposalIndex]"
                    :list="teamList" @submit="handleSubmitPropOne" @close="showOverlay = false"/>
     <v-card v-if="GameStatus && GameStatus.proposalStage === 3" class="pa-8" width="600">
       <div class="text-lg-h6 mb-6">请填写投票结果</div>
@@ -117,12 +109,17 @@ const proposalList = ref<ApiMap['/proposal/upload/first']['req']['proposals']>([
 const voteForm = ref<Array<{ data: string, teamId: number }>>([])
 const proposalIndex = ref<number>(0)
 
+function handleEditProp(index: number) {
+  proposalIndex.value = index
+  showOverlay.value = true
+}
+
 function handleSubmitPropOne(payload: {id: number, ids: number[], score: number[]}) {
-  proposalList.value.push({
+  proposalList.value[proposalIndex.value] = {
     proposerTeamId: payload.id,
     involvedTeamIds: payload.ids,
     scoreDistribution: payload.score,
-  })
+  }
   showOverlay.value = false
 }
 
