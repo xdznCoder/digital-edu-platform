@@ -76,6 +76,7 @@ let tileSets = reactive<ApiMap['/game/occupyStatus/:gameId']['resp']>({
 function onHexClick(id: number) {
   if (actionLeft.value === 0) return
   if (tileSets.teams.flat().map(item => item.occupiedTiles).flat().includes(id)) return
+  if (tileSelected.value.includes(id)) return
   if (tileSets.blackSwampTiles.includes(id)) return
   if (tileSets.goldCenterTiles.includes(id)) {
     goldenCenterOccupy.value = {b: true, id: id}

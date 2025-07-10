@@ -1,4 +1,4 @@
-<template>
+  <template>
   <v-card height="660" width="500">
     <div class="text-h6 pa-4 pl-8 bg-blue-lighten-1">AI 总结</div>
 
