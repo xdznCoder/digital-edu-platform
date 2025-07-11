@@ -14,24 +14,22 @@
                       v-model="proposalNum"
         ></v-text-field>
       </div>
-      <v-btn v-if="GameStatus && GameStatus.proposalStage === 2"
+      <v-btn v-if="ProposalStatus() === 2"
              variant="outlined"
              color="primary"
              @click="useSubmitProposal">提交提案</v-btn>
-      <v-btn v-if="GameStatus && GameStatus.proposalStage === 3"
+      <v-btn v-if="ProposalStatus() === 3"
              variant="outlined"
              color="primary"
              @click="useSubmitVote">提交投票</v-btn>
+      <v-btn v-if="ProposalStatus() === 4"
+             variant="outlined"
+             color="primary"
+             @click="emits('update')">开始淘汰赛</v-btn>
     </div>
     <v-card rounded min-height="650" class="ma-4">
       <v-data-table
-          :items="proposalList ? proposalList.map((item: any) => (
-            {
-            '提出提案': `第 ${item.proposerTeamId} 组`,
-            '参与游戏': item.involvedTeamIds.map((i: number) => `第 ${i} 组`).join('，'),
-            '分值分配': item.scoreDistribution.map((i: number) => `${i} 分`).join('，'),
-            '操作':true
-            })) : []"
+          :items="proposalList ? GetTableData() : []"
           hide-default-footer
           no-data-text="请先提交游戏设置"
       >
@@ -45,15 +43,22 @@
         </template>
 
         <!--      eslint-disable-next-line vue/valid-v-slot-->
+        <template v-slot:item.是否被选中="{ value }">
+          <v-chip v-if="ProposalStatus() === 4"
+                  :color="value ? 'green' : 'red'"
+          >{{value ? '选中' : '落选'}}</v-chip>
+        </template>
+
+        <!--      eslint-disable-next-line vue/valid-v-slot-->
         <template v-slot:item.操作="{ index }">
           <v-icon
-              v-if="GameStatus && GameStatus.proposalStage === 2"
+              v-if="ProposalStatus() === 2"
               color="medium-emphasis"
               icon="mdi-pencil"
               size="small"
               @click="handleEditProp(index)">
           </v-icon>
-          <v-btn v-if="GameStatus && GameStatus.proposalStage === 3"
+          <v-btn v-if="ProposalStatus() === 3"
                  class="px-2"
                  prepend-icon="mdi-vote"
                  @click="()=> {showOverlay = true; proposalIndex = index}"
@@ -63,10 +68,10 @@
     </v-card>
   </div>
   <v-overlay v-model="showOverlay" class="align-center justify-center">
-    <SubmitPropOne v-if="GameStatus && GameStatus.proposalStage === 2"
+    <SubmitPropOne v-if="ProposalStatus() === 2"
                    :team="proposalList[proposalIndex]"
                    :list="teamList" @submit="handleSubmitPropOne" @close="showOverlay = false"/>
-    <v-card v-if="GameStatus && GameStatus.proposalStage === 3" class="pa-8" width="600">
+    <v-card v-if="ProposalStatus() === 3" class="pa-8" width="600">
       <div class="text-lg-h6 mb-6">请填写投票结果</div>
       <div v-for="(value, index) of voteForm" :key="index">
         <div class="d-flex" v-if="index === proposalIndex">
@@ -114,6 +119,15 @@ function handleEditProp(index: number) {
   showOverlay.value = true
 }
 
+function ProposalStatus (): number {
+  if (!GameStatus.value) return 0
+  if (GameStatus.value.proposalStage < 3) return GameStatus.value.proposalStage
+  else if (GameStatus.value.proposalStage === 3) {
+    if (proposalList.value && proposalList.value.filter((item: any) => item.isSelected).length > 0) return 4
+    else return 3
+  } else return 5
+}
+
 function handleSubmitPropOne(payload: {id: number, ids: number[], score: number[]}) {
   proposalList.value[proposalIndex.value] = {
     proposerTeamId: payload.id,
@@ -121,6 +135,24 @@ function handleSubmitPropOne(payload: {id: number, ids: number[], score: number[
     scoreDistribution: payload.score,
   }
   showOverlay.value = false
+}
+
+function GetTableData () {
+  if (ProposalStatus() === 4)
+    return proposalList.value ? proposalList.value.map((item: any) => (
+        {
+          '提出提案': `第 ${item.proposerTeamId} 组`,
+          '参与小组': item.involvedTeamIds.map((i: number) => `第 ${i} 组`).join('，'),
+          '分值分配': item.scoreDistribution.map((i: number) => `${i} 分`).join('，'),
+          '是否被选中': item.isSelected
+        })) : []
+  else return proposalList.value ? proposalList.value.map((item: any) => (
+      {
+        '提出提案': `第 ${item.proposerTeamId} 组`,
+        '参与小组': item.involvedTeamIds.map((i: number) => `第 ${i} 组`).join('，'),
+        '分值分配': item.scoreDistribution.map((i: number) => `${i} 分`).join('，'),
+        '操作': true
+      })) : []
 }
 
 const useProposalList = () => {
@@ -180,7 +212,7 @@ const useSubmitVote = () => {
       gameId: GameStatus.value!.id,
       round: GameStatus.value!.proposalRound,
       votes: votesList}),
-    onSuccess: () => {emits('update')},
+    onSuccess: () => {useProposalList()},
     tip: '上传成功'
   })
 }

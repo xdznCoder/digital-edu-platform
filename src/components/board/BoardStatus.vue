@@ -2,7 +2,7 @@
   <v-card v-if="GameStatus">
       <div class="px-6 py-2 bg-indigo-lighten-2 d-flex justify-space-between">
         <div class="text-h6 ">游戏状态</div>
-        <v-btn class="mr-2" variant="outlined" color="white" @click="emits('update')">下一轮</v-btn>
+        <v-btn class="mr-2" variant="outlined" color="white" @click="emits('update')">下一阶段</v-btn>
       </div>
     <div class="ma-4">
       <div class="ma-3"><span class="font-weight-bold">游戏赛段：</span>
