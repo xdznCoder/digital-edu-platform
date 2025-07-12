@@ -50,7 +50,10 @@
         </div>
 
         <div v-if="proposalTeam?.filter((item: any) => item.isSelected).length !== 0" class="ma-2">提案中选小组：
-          <v-chip v-for="(v, i) of proposalTeam.filter((item: any) => item.isSelected)" color="indigo" :key="i" class="ma-1">
+          <v-chip v-for="(v, i) of proposalTeam.filter((item: any) => item.isSelected)"
+                  color="indigo"
+                  :key="i" class="ma-1"
+                  @click="showOverlay = true">
             第 {{ v.proposerTeamId }} 组
           </v-chip>
         </div>
@@ -71,6 +74,51 @@
       </div>
     </div>
   </v-card>
+  <v-overlay v-model="showOverlay" class="align-center justify-center">
+    <v-card class="pa-6" elevation="8" width="400" rounded="xl">
+      <v-card-title class="text-h6 font-weight-bold mb-3">
+        <v-icon start class="mr-2" color="primary">mdi-account-group</v-icon>
+        提案中选小组评分信息
+      </v-card-title>
+      <v-divider class="mb-2" />
+      <v-card-text>
+        <div class="info-line"><span class="label">中选小组：</span>第 {{ winnerInfo.teamId }} 组</div>
+        <div class="info-line"><span class="label">组长：</span>{{ winnerInfo.leaderName }}</div>
+        <div class="info-line"><span class="label">分数：</span>{{ winnerInfo.score }} 分</div>
+        <div class="info-line"><span class="label">当前轮次：</span>第 {{ winnerInfo.round }} 轮</div>
+
+        <div v-if="winnerInfo && GameStatus?.proposalRound === 1">
+          <div class="mt-4 font-weight-medium mb-2">评分分配：</div>
+          <v-list density="compact" class="bg-grey-lighten-5 rounded">
+            <v-list-item class="ma-0"
+                         v-for="(score, index) in winnerInfo.allocations"
+                         :key="index">
+              第 {{ winnerInfo.team[index] }} 组：<strong>{{ score }}</strong> 分
+            </v-list-item>
+          </v-list>
+        </div>
+
+        <div v-if="winnerInfo && GameStatus?.proposalRound === 2">
+          <div class="info-line">
+          <span class="label">辩论正方：</span>
+              <span>{{winnerInfo.team.slice(0, Math.floor(winnerInfo.team.length / 2)).map((item: number) => `第 ${item} 组`).join('，')}}</span>
+          </div>
+
+          <div class="info-line">
+            <span class="label">辩论反方：</span>
+            <span>{{winnerInfo.team.slice(Math.floor(winnerInfo.team.length / 2)).map((item: number) => `第 ${item} 组`).join('，')}}</span>
+          </div>
+        </div>
+
+        <div v-if="winnerInfo && GameStatus?.proposalRound === 3">
+          <div class="info-line">
+          <span class="label">参与游戏小组：</span>
+              <span>{{winnerInfo.team.map((item: number) => `第 ${item} 组`).join('，')}}</span>
+          </div>
+        </div>
+      </v-card-text>
+    </v-card>
+  </v-overlay>
 </template>
 
 <script setup lang="ts">
@@ -80,11 +128,13 @@ import {useApi} from "@/api/handler";
 import {proposal} from "@/api";
 
 const props = defineProps<{
-  data?: ApiMap['/game/status/:id']['resp']
+  data: ApiMap['/game/status/:id']['resp']
 }>()
 const GameStatus = ref<ApiMap['/game/status/:id']['resp'] | null>(null)
 const propStage = ['初始化提案积分', '选择提案提出轮次', '每轮提出提案', '投票', '正式游戏']
 const proposalTeam = ref<ApiMap['/proposal/list']['resp']>([])
+const showOverlay = ref<boolean>(false)
+const winnerInfo = ref<ApiMap['/proposal/selected/:game/:round']['resp'] | null>(null)
 
 const useProposalList = () => {
   if (!GameStatus.value) return
@@ -97,9 +147,22 @@ const useProposalList = () => {
   })
 }
 
+const useWinProposal = () => {
+  if (!GameStatus.value) return
+  useApi({
+    api: proposal.WinProposal(GameStatus.value.id, GameStatus.value.proposalRound),
+    onSuccess: resp => {
+      winnerInfo.value = resp.data as ApiMap['/proposal/selected/:game/:round']['resp']
+    }
+  })
+}
+
 watch(() => props.data, newVal => {
   GameStatus.value = newVal ?? null
-  if (GameStatus.value && GameStatus.value.status !== 2) useProposalList()
+  if (!GameStatus.value) return
+  if (GameStatus.value?.status === 2) return
+  useProposalList()
+  if (GameStatus.value.proposalStage === 4) useWinProposal()
 }, {immediate: true})
 </script>
 
@@ -108,6 +171,16 @@ watch(() => props.data, newVal => {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   width: 320px;
   background-color: #fff;
+}
+
+.info-line {
+  margin-bottom: 8px;
+  display: flex;
+}
+.label {
+  width: 120px;
+  font-weight: bold;
+  color: #555;
 }
 </style>
 

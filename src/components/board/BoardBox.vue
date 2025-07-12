@@ -134,11 +134,6 @@ watch(() => [props.originX, props.originY, props.radius, tileSets],() => {
   hexGrid.render(props.originX, props.originY, props.radius, tileSets, GameStatus.value.chessRound)
 })
 
-onMounted(() => {
-  if (GameStatus.value.chessPhase === 2) useUnselectedList()
-  if (GameStatus.value.stage !== 0) useTileSets()
-})
-
 const useGameInit = () => {
   if (!GameStatus.value) return
   const originSet = GameUtils.getOriginTileSet()
@@ -211,7 +206,7 @@ watch(() => props.data, newVal => {
   if (newVal.stage === 0) useGameInit()
   if (newVal.chessPhase === 2) useUnselectedList()
   GameStatus.value = newVal
-  useTileSets()
+  if (GameStatus.value.stage !== 0) useTileSets()
   if(newVal.chessRound === 3 && newVal.chessPhase === 0) {
     et.showEventTip('机会宝地已在地图上出现')
   }

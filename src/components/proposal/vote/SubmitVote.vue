@@ -9,14 +9,14 @@
           density="compact"
           :item-title="(item: any) => item.teamId ? `第 ${item.teamId} 组` : null"
           item-value="teamId"
-          placeholder="请选择参与提案的小组"
+          placeholder="请选择参与投票的小组"
           multiple
           variant="outlined"
       ></v-select>
     </div>
     <div class="d-flex mb-3">
       <div class="mt-1" style="width: 150px">票数分配</div>
-      <v-text-field placeholder="请依次填入分值分配"
+      <v-text-field placeholder="请依次填入票数分配"
                     v-model="tempVoteScore"
                     variant="outlined"
                     density="compact"

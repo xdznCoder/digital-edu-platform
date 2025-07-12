@@ -338,6 +338,7 @@ export interface ApiMap {
             proposerTeamName: string
             involvedTeamIds: number[]
             scoreDistribution: number[]
+            voteCount   : number
             isSelected: boolean
         }>
     },
@@ -515,5 +516,17 @@ export interface ApiMap {
     '/proposal/init/list': {
         req: {gameId: number, sort: number},
         resp: Array<number>
+    },
+    '/proposal/selected/:game/:round': {
+        req: {game: number, round: number},
+        resp: {
+            teamId: number
+            leaderName: string
+            score: number
+            proposalId: number
+            allocations: number[]
+            team: number[]
+            round: number
+        }
     }
 }

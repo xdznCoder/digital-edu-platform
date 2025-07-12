@@ -106,7 +106,6 @@ const useThirdRank = () => {
     api: proposal.ThirdRank(GameStatus.value.id),
     onSuccess: resp => {
       teamList.value = resp.data as ApiMap['/proposal/rank/third']['resp']
-      emits('update')
     }
   })
 }

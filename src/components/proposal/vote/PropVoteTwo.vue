@@ -132,6 +132,7 @@ function GetTableData () {
           '提出提案': `第 ${item.proposerTeamId} 组`,
           '正方小组': item.proTeamIds.map((i: number) => `第 ${i} 组`).join('，'),
           '反方小组': item.conTeamIds.map((i: number) => `第 ${i} 组`).join('，'),
+          '总票数': `${item.voteCount} 票`,
           '是否被选中': item.isSelected
         })) : []
   else return proposalList.value ? proposalList.value.map((item: any) => (
@@ -152,11 +153,13 @@ const useProposalList = () => {
       const tempList = resp.data as ApiMap['/proposal/list']['resp']
       proposalList.value = tempList.map(item => ({
         id: item.id,
+        voteCount: item.voteCount,
         isSelected: item.isSelected,
         proposerTeamId: item.proposerTeamId,
         proTeamIds: item.involvedTeamIds.slice(0, Math.floor(item.involvedTeamIds.length / 2)),
         conTeamIds: item.involvedTeamIds.slice(Math.floor(item.involvedTeamIds.length / 2))
       }))
+      console.log(proposalList.value)
       voteForm.value = proposalList.value.map(item => ({
         data: '',
         teamId: item.proposerTeamId
@@ -227,6 +230,7 @@ const useSubmitVote = () => {
     tip: '上传成功'
   })
 }
+
 const useRemovedList = () => {
   if (!GameStatus.value) return
   useApi({

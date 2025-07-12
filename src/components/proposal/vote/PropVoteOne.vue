@@ -125,7 +125,7 @@ function handleSubmitPropOne(payload: {id: number, ids: number[], score: number[
   proposalList.value[proposalIndex.value] = {
     proposerTeamId: payload.id,
     involvedTeamIds: payload.ids,
-    scoreDistribution: payload.score,
+    scoreDistribution: payload.score
   }
   showOverlay.value = false
 }
@@ -137,6 +137,7 @@ function GetTableData () {
           '提出提案': `第 ${item.proposerTeamId} 组`,
           '参与小组': item.involvedTeamIds.map((i: number) => `第 ${i} 组`).join('，'),
           '分值分配': item.scoreDistribution.map((i: number) => `${i} 分`).join('，'),
+          '总票数': `${item.voteCount} 票`,
           '是否被选中': item.isSelected
         })) : []
   else return proposalList.value ? proposalList.value.map((item: any) => (

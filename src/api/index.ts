@@ -299,6 +299,12 @@ export const proposal = {
         method: 'GET',
         data: {gameId},
         withToken: true
+    }),
+    WinProposal: (game: number, round: number) => request({
+        url: '/proposal/selected/:game/:round',
+        method: "GET",
+        pathParam: {game, round},
+        withToken: true
     })
 }
 

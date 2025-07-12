@@ -105,7 +105,7 @@ import {game} from '@/api'
 import {useApi} from '@/api/handler'
 
 const props = defineProps<{
-  data: ApiMap['/game/status/:id']['resp']
+  data?: ApiMap['/game/status/:id']['resp']
   maxHeight?: number
   showChange?: boolean
   mode?: 'team' | 'student'

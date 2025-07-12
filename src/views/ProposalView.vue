@@ -2,8 +2,8 @@
   <div class="proposal-view-container d-flex flex-column">
     <PropHeader @show-overlay="showOverlay = true"/>
     <div class="proposal-main ma-4 d-flex">
-      <PropSidebar class="mr-4" :data="GameStatus"/>
-      <div class="d-flex flex-column w-100">
+        <PropSidebar :data="GameStatus"/>
+      <div class="d-flex ml-4 flex-column w-100">
         <v-card style="flex: 1" v-if="GameStatus">
           <StepBar class="my-6 d-flex justify-center" :model-value="stage" :items="items"></StepBar>
           <v-divider></v-divider>

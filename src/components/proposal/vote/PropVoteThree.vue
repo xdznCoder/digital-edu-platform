@@ -126,6 +126,7 @@ function GetTableData () {
         {
           '提出提案': `第 ${item.proposerTeamId} 组`,
           '参与小组': item.involvedTeamIds.map((i: number) => `第 ${i} 组`).join('，'),
+          '总票数': `${item.voteCount} 票`,
           '是否被选中': item.isSelected
         })) : []
   else return proposalList.value ? proposalList.value.map((item: any) => (

@@ -45,12 +45,12 @@ import {game} from "@/api";
 import DynamicForm from "@/components/DynamicForm.vue";
 
 const props = defineProps<{
-  data: ApiMap['/game/status/:id']['resp']
+  data?: ApiMap['/game/status/:id']['resp']
 }>()
 
 const emits = defineEmits(['update'])
 
-const GameStatus = ref<ApiMap['/game/status/:id']['resp']>(props.data)
+const GameStatus = ref<ApiMap['/game/status/:id']['resp'] | null>(null)
 const eventData = ref<ApiMap['/game/special/list']['resp'] | null>(null)
 
 const submitObject = reactive({
@@ -59,8 +59,8 @@ const submitObject = reactive({
   data: {}
 })
 
-watch(() => props.data, () => {
-  GameStatus.value = props.data
+watch(() => props.data, newVal => {
+  GameStatus.value = newVal ?? null
   useSpecialList()
 })
 
