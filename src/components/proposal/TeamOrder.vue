@@ -14,8 +14,8 @@
       <v-tabs-window v-model="tabValue">
         <v-tabs-window-item :value="num" class="my-6 mx-8" v-for="num of [1, 2, 3]" :key="num">
           <v-card>
-            <div class="d-flex justify-center pa-4 bg-blue-lighten-1">第 {{num}} 轮共 {{splitThree(GameStatus.teamCount)[num - 1]}} 组,
-              还可选择 {{splitThree(GameStatus.teamCount)[num - 1]-selectedTeam[num - 1].filter((item: any) => item.check).length}} 组
+            <div class="d-flex justify-center pa-4 bg-blue-lighten-1">第 {{num}} 轮共 {{GetMaxSelected(num)}} 组,
+              还可选择 {{GetMaxSelected(num)-selectedTeam[num - 1].filter((item: any) => item.check).length}} 组
             </div>
             <v-data-table
                 hide-default-footer
@@ -26,7 +26,7 @@
               <!-- eslint-disable-next-line vue/valid-v-slot -->
               <template v-slot:item.check="{ item }">
                 <v-checkbox-btn
-                    :disabled="selectedTeam[num - 1].filter((item: any) => item.check).length >= splitThree(GameStatus.teamCount)[num - 1]"
+                    :disabled="selectedTeam[num - 1].filter((item: any) => item.check).length >= GetMaxSelected(num)"
                     v-model="item.check"
                     :ripple="false"
                 ></v-checkbox-btn>
@@ -39,7 +39,7 @@
       </v-tabs-window>
     </div>
     <div class="tile-rank">
-      <TileRank show-change max-height="700" class="ma-4" :data="GameStatus" />
+      <InitDelete max-height="700" class="ma-4" :data="GameStatus" @update="emits('update')"/>
     </div>
   </div>
 </template>
@@ -49,8 +49,8 @@ import {ref, watch, defineProps, defineEmits} from "vue";
 import {useApi} from "@/api/handler";
 import {game, proposal} from "@/api";
 import {ApiMap} from "@/api/type";
-import TileRank from "@/components/board/TileRank.vue";
 import {splitThree} from "@/utils/random";
+import InitDelete from "@/components/proposal/init/InitDelete.vue";
 
 const props = defineProps<{
   data: ApiMap['/game/status/:id']['resp']
@@ -60,6 +60,7 @@ const GameStatus = ref<ApiMap['/game/status/:id']['resp'] | null>(null)
 const tabValue = ref<number>(1)
 const tileRank = ref<ApiMap['/game/rank/team/:id']['resp']>([])
 const selectedTeam = ref<Array<Array<{teamId: string, teamLeader: string, check: boolean}>>>([[], [], []])
+const removedList = ref<Array<number>>([])
 
 const headers = [
   {title: '组号', value: 'teamId', align: 'center'},
@@ -67,12 +68,18 @@ const headers = [
   {title: '选择', value: 'check'}
 ]
 
+function GetMaxSelected(num: number) {
+  if (!GameStatus.value) return 0
+  return splitThree(GameStatus.value.teamCount - removedList.value.length)[num - 1]
+}
+
 const useTileRank = () => {
   if (!props.data) return
   useApi({
     api: game.TileRank(props.data.id),
     onSuccess: resp => {
-      tileRank.value = resp.data as ApiMap['/game/rank/team/:id']['resp']
+      tileRank.value = (resp.data as ApiMap['/game/rank/team/:id']['resp'])
+          .filter(item => !removedList.value.includes(item.teamId))
       selectedTeam.value[0] = tileRank.value
           .sort((a, b) => a.teamId - b.teamId)
           .map((item: any) => ({teamId: `第 ${item.teamId} 组`, teamLeader: item.leaderName, check: false}))
@@ -102,9 +109,21 @@ const useSubmitOrder = () => {
   })
 }
 
+const useRemovedList = () => {
+  if (!GameStatus.value) return
+  useApi({
+    api: game.RemoveList(GameStatus.value.id),
+    onSuccess: resp => {
+      removedList.value = resp.data as Array<number>
+      useTileRank()
+    }
+  })
+}
+
 watch(() => props.data, () => {
   GameStatus.value = props.data ?? null
   useTileRank()
+  useRemovedList()
 }, {immediate: true})
 </script>
 

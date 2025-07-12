@@ -28,7 +28,8 @@
       ></v-text-field>
     </div>
 
-    <div class="mb-4 text-subtitle-1 font-weight-medium">学生评分</div>
+    <div class="mb-4 text-subtitle-1 font-weight-medium" v-if="tempStudentScores && tempStudentScores.length > 0">
+      学生评分</div>
 
     <div
         v-for="(score, index) in tempStudentScores"

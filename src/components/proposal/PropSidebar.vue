@@ -43,7 +43,7 @@
           </v-chip>
         </div>
 
-        <div class="ma-2" v-if="proposalTeam">本轮提案小组：
+        <div class="ma-2" v-if="proposalTeam && GameStatus.proposalStage >= 2">本轮提案小组：
           <v-chip v-for="(v, i) of proposalTeam" density="compact" :key="i" class="ma-1">
             第 {{ v.proposerTeamId }} 组
           </v-chip>

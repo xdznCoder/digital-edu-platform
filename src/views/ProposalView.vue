@@ -41,7 +41,7 @@ import {useApi} from "@/api/handler";
 import {game} from "@/api";
 import {useRoute} from "vue-router";
 import StepBar from "@/components/StepBar.vue";
-import InitProp from "@/components/proposal/InitProp.vue";
+import InitProp from "@/components/proposal/init/InitProp.vue";
 import TeamOrder from "@/components/proposal/TeamOrder.vue";
 import PropVoteOne from "@/components/proposal/vote/PropVoteOne.vue";
 import KnockOut from "@/components/proposal/KnockOut.vue";
@@ -49,7 +49,6 @@ import PropVoteTwo from "@/components/proposal/vote/PropVoteTwo.vue";
 import PropVoteThree from "@/components/proposal/vote/PropVoteThree.vue";
 import BuzzQuiz from "@/components/proposal/BuzzQuiz.vue";
 import SummaryBox from "@/components/SummaryBox.vue";
-import NewStudent from "@/components/class/NewStudent.vue";
 import RankList from "@/components/proposal/RankList.vue";
 
 const GameStatus = ref<ApiMap['/game/status/:id']['resp'] | null>(null)

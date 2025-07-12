@@ -203,6 +203,7 @@ export interface ApiMap {
             totalTile:  number
             leaderSno:  string
             totalScore: number
+            status: number
         }>
     },
     '/game/upload/assign': {
@@ -502,5 +503,17 @@ export interface ApiMap {
             avatar: string
         },
         resp: null
+    },
+    '/game/outTeam': {
+        req: {
+            gameId: number
+            teamIds: number[]
+            type: number
+        }
+        resp: null
+    },
+    '/proposal/init/list': {
+        req: {gameId: number, sort: number},
+        resp: Array<number>
     }
 }

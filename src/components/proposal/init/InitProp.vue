@@ -19,17 +19,17 @@
       <v-btn class="ml-10 mt-5" color="primary" max-width="450" width="100%" @click="useProposalInit">提交</v-btn>
     </div>
     <div class="tile-rank">
-      <TileRank show-change max-height="700" class="ma-4" :data="GameStatus" />
+      <InitDelete show-delete max-height="700" class="ma-4" :data="GameStatus" @update="emits('update')"/>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import TileRank from "@/components/board/TileRank.vue";
 import {ApiMap} from "@/api/type";
 import {ref, watch, defineProps, defineEmits} from "vue";
 import {useApi} from "@/api/handler";
-import {proposal} from "@/api";
+import {game, proposal} from "@/api";
+import InitDelete from "@/components/proposal/init/InitDelete.vue";
 
 const props = defineProps<{
   data?: ApiMap['/game/status/:id']['resp']
@@ -37,6 +37,7 @@ const props = defineProps<{
 const emits = defineEmits(['update'])
 const GameStatus = ref<ApiMap['/game/status/:id']['resp'] | null>(null)
 const teamPoints = ref<Array<{teamId: number, initialScore: number, gameId: number}> | null>(null)
+const removedList = ref<Array<number>>([])
 
 function initTeamPoints() {
   if (!GameStatus.value) return
@@ -45,7 +46,7 @@ function initTeamPoints() {
         teamId: item,
         initialScore: 0,
         gameId: GameStatus.value!.id
-      }))
+      })).filter(item => !removedList.value.includes(item.teamId))
 }
 
 const useProposalInit = () => {
@@ -57,9 +58,21 @@ const useProposalInit = () => {
   })
 }
 
+const useRemovedList = () => {
+  if (!GameStatus.value) return
+  useApi({
+    api: game.RemoveList(GameStatus.value.id),
+    onSuccess: resp => {
+      removedList.value = resp.data as Array<number>
+      initTeamPoints()
+    }
+  })
+}
+
 watch(() => props.data, () => {
   GameStatus.value = props.data ?? null
   initTeamPoints()
+  useRemovedList()
 }, {immediate: true})
 </script>
 

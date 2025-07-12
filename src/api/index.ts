@@ -193,6 +193,18 @@ export const game = {
         method: 'GET',
         pathParam: {id},
         withToken: true
+    }),
+    RemoveTeam: (data: ApiMap['/game/outTeam']['req']) => request({
+        url: '/game/outTeam',
+        method: 'PUT',
+        data: data,
+        withToken: true
+    }),
+    RemoveList: (gameId: number) => request({
+        url: '/proposal/init/list',
+        method: 'GET',
+        data: {gameId, sort: 1},
+        withToken: true
     })
 }
 

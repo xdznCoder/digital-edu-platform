@@ -71,25 +71,10 @@
     <SubmitPropOne v-if="ProposalStatus() === 2"
                    :team="proposalList[proposalIndex]"
                    :list="teamList" @submit="handleSubmitPropOne" @close="showOverlay = false"/>
-    <v-card v-if="ProposalStatus() === 3" class="pa-8" width="600">
-      <div class="text-lg-h6 mb-6">请填写投票结果</div>
-      <div v-for="(value, index) of voteForm" :key="index">
-        <div class="d-flex" v-if="index === proposalIndex">
-          <div style="width: 200px" class="mt-1">投票结果</div>
-          <v-text-field max-width="400"
-                        class="mb-6"
-                        placeholder="请填写投票结果"
-                        hint="请按从小到大依次填入投票票数，用英文逗号隔开"
-                        density="compact"
-                        variant="outlined"
-                        v-model="value.data"
-          ></v-text-field>
-        </div>
-      </div>
-      <div class="d-flex justify-end">
-        <v-btn class="mr-4" color="primary" @click="showOverlay = false">确认</v-btn>
-      </div>
-    </v-card>
+    <SubmitVote v-if="ProposalStatus() === 3" class="pa-8" width="600"
+                :list="teamList" :votes="voteMap.get(proposalIndex)"
+                :proposer-id="proposalList[proposalIndex].id"
+                @submit="handleVote" @close="showOverlay = false"/>
   </v-overlay>
 </template>
 
@@ -97,9 +82,10 @@
 import {defineProps, defineEmits, ref, watch} from "vue";
 import {ApiMap} from "@/api/type";
 import {useApi} from "@/api/handler";
-import {proposal, team} from "@/api";
+import {game, proposal, team} from "@/api";
 import SubmitPropOne from "@/components/proposal/vote/SubmitPropOne.vue";
 import store from "@/store";
+import SubmitVote from "@/components/proposal/vote/SubmitVote.vue";
 
 const props = defineProps<{
   data: ApiMap['/game/status/:id']['resp']
@@ -113,10 +99,17 @@ const proposalNum = ref<number | null>(null)
 const proposalList = ref<ApiMap['/proposal/upload/first']['req']['proposals']>([])
 const voteForm = ref<Array<{ data: string, teamId: number }>>([])
 const proposalIndex = ref<number>(0)
+const voteMap = new Map<number, {teamId: number, proposalId: number, score: number}[]>()
+const removedList = ref<Array<number>>([])
 
 function handleEditProp(index: number) {
   proposalIndex.value = index
   showOverlay.value = true
+}
+
+function handleVote(input: {teamId: number, proposalId: number, score: number}[]) {
+  voteMap.set(proposalIndex.value, input)
+  showOverlay.value = false
 }
 
 function ProposalStatus (): number {
@@ -176,6 +169,7 @@ const useTeamList = () => {
     api: team.TeamList(GameStatus.value.id),
     onSuccess: resp => {
       teamList.value = (resp.data as ApiMap['/team/game/:id']['resp']).teams
+          .filter((item: any) => !removedList.value.includes(item.teamId))
     }
   })
 }
@@ -198,15 +192,13 @@ const useSubmitProposal = () => {
 
 const useSubmitVote = () => {
   let votesList: ApiMap['/proposal/vote']['req']['votes'] = []
-  voteForm.value.map(item => {
-    item.data.split(',').forEach((v, i) => {
-      votesList.push({
-        teamId: i + 1,
-        score: Number(v),
-        proposalId: (proposalList.value as ApiMap['/proposal/list']['resp']).filter(i => i.proposerTeamId === item.teamId)[0].id
-      })
-    })
+  voteMap.forEach(value => {
+    votesList.push(...value)
   })
+  if (new Set(votesList.map(value => value.teamId)).size < votesList.length) {
+    store.dispatch('snackBarModule/showError', '存在重复投票')
+    return
+  }
   useApi({
     api: proposal.SubmitVote({
       gameId: GameStatus.value!.id,
@@ -216,10 +208,20 @@ const useSubmitVote = () => {
     tip: '上传成功'
   })
 }
+const useRemovedList = () => {
+  if (!GameStatus.value) return
+  useApi({
+    api: game.RemoveList(GameStatus.value.id),
+    onSuccess: resp => {
+      removedList.value = resp.data as Array<number>
+      useTeamList()
+    }
+  })
+}
 
 watch(() => props.data, () => {
   GameStatus.value = props.data ?? null
-  useTeamList()
   useProposalList()
+  useRemovedList()
 }, {immediate: true})
 </script>
