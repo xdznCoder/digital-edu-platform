@@ -45,7 +45,8 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: '/login',
     name: 'login',
-    component: LoginView
+    component: LoginView,
+    meta: {title: '数字化教学平台 - 首页'},
   },
   {
     path: '/board',
@@ -68,5 +69,10 @@ const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),
   routes
 })
+
+router.beforeEach(() => {
+    document.title = '西南石油大学 - 数字化教学平台'
+})
+
 
 export default router
