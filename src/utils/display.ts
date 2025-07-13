@@ -19,9 +19,9 @@ const teamColorMap = [
     '#69b08c',
     '#FFB266',
     '#FF99CC',
-    '#B2FF66',
-    '#FFE699',
-    '#99FFFF',
+    '#B2EE67',
+    '#FFE59F',
+    '#99EEEE',
     '#CCCCFF',
     '#FFCCE5'
 ]

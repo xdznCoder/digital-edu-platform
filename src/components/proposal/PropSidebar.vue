@@ -84,7 +84,7 @@
       <v-card-text>
         <div class="info-line"><span class="label">中选小组：</span>第 {{ winnerInfo.teamId }} 组</div>
         <div class="info-line"><span class="label">组长：</span>{{ winnerInfo.leaderName }}</div>
-        <div class="info-line"><span class="label">分数：</span>{{ winnerInfo.score }} 分</div>
+        <div class="info-line"><span class="label">票数：</span>{{ winnerInfo.score }} 票</div>
         <div class="info-line"><span class="label">当前轮次：</span>第 {{ winnerInfo.round }} 轮</div>
 
         <div v-if="winnerInfo && GameStatus?.proposalRound === 1">

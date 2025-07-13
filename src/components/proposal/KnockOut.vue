@@ -7,7 +7,7 @@
         <v-btn class="ml-4" color="red-lighten-2" @click="useKnockoutTeam">淘汰选中</v-btn>
       </div>
     </div>
-    <v-card class="mx-4">
+    <v-card class="mx-4" style="overflow-y: auto;">
       <div class="py-4 d-flex text-h6 justify-center bg-indigo-lighten-2">学习通答题情况</div>
       <v-data-table :items="gradeList ?? []"
                     height="600"
@@ -16,6 +16,7 @@
                     item-value="teamId"
                     hide-default-footer
                     v-model="selectedTeam"
+                    v-model:items-per-page="pageSize"
                     no-data-text="请先传入学习通数据"
       >
         <!-- eslint-disable-next-line vue/valid-v-slot -->
@@ -55,6 +56,7 @@ const headers = [
 ]
 const statusMap = ['未参赛', '已淘汰', '未淘汰']
 const colorMap = ['', 'red', 'green']
+const pageSize = ref<number>(100)
 
 const useFirstUpload = (file: File) => {
   useApi({

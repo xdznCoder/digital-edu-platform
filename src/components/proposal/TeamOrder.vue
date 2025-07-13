@@ -13,7 +13,7 @@
       </v-tabs>
       <v-tabs-window v-model="tabValue">
         <v-tabs-window-item :value="num" class="my-6 mx-8" v-for="num of [1, 2, 3]" :key="num">
-          <v-card>
+          <v-card height="480" style="overflow-y: auto">
             <div class="d-flex justify-center pa-4 bg-blue-lighten-1">第 {{num}} 轮共 {{GetMaxSelected(num)}} 组,
               还可选择 {{GetMaxSelected(num)-selectedTeam[num - 1].filter((item: any) => item.check).length}} 组
             </div>
@@ -22,6 +22,7 @@
                 :items="selectedTeam[num - 1]"
                 item-value="teamId"
                 :headers="headers"
+                v-model:items-per-page="pageSize"
             >
               <!-- eslint-disable-next-line vue/valid-v-slot -->
               <template v-slot:item.check="{ item }">
@@ -61,6 +62,7 @@ const tabValue = ref<number>(1)
 const tileRank = ref<ApiMap['/game/rank/team/:id']['resp']>([])
 const selectedTeam = ref<Array<Array<{teamId: string, teamLeader: string, check: boolean}>>>([[], [], []])
 const removedList = ref<Array<number>>([])
+const pageSize = ref<number>(100)
 
 const headers = [
   {title: '组号', value: 'teamId', align: 'center'},

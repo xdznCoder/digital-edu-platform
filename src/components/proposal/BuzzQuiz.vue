@@ -6,7 +6,7 @@
         <v-btn class="ml-4" rounded color="primary" variant="outlined" @click="useSubmitBuzz">结束抢答赛</v-btn>
       </div>
     </div>
-    <v-card class="mx-4">
+    <v-card class="mx-4" style="overflow-y: auto">
       <div class="py-4 d-flex text-h6 justify-center bg-indigo-lighten-2">当前抢答赛排名</div>
       <v-data-table :items="handleTeamList() ?? []"
                     height="550"
@@ -15,6 +15,7 @@
                     hide-default-footer
                     no-data-text="请先传入学习通数据"
                     class="pa-4"
+                    v-model:items-per-page="pageSize"
       >
         <!-- eslint-disable-next-line vue/valid-v-slot -->
         <template v-slot:item.rank ="{ index }">
@@ -75,6 +76,7 @@ const headers = [
 const showOverlay = ref<boolean>(false)
 const tempIndex = ref<number>(0)
 const scoreMap = reactive(new Map<number, ApiMap['/proposal/buzzed']['req']>())
+const pageSize = ref<number>(100)
 
 function handleChange(index: number) {
   tempIndex.value = index

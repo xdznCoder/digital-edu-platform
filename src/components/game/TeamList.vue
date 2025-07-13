@@ -1,12 +1,13 @@
 <template>
-  <v-card class="w-100 my-4 mx-10 team-list-table">
+  <v-card class="w-100 my-4 mx-10" :height="700" style="overflow-y: auto;">
     <div class="px-10 py-4 bg-indigo-lighten-2 text-lg-h6">分组情况</div>
     <v-data-table
         :items="teamList ? teamList.teams : []"
         :headers="headers"
         item-value="teamId"
-        hide-default-footer
         show-expand
+        hide-default-footer
+        v-model:items-per-page="pageSize"
         no-data-text="请先提交游戏设置"
     >
 
@@ -36,6 +37,7 @@ import {useApi} from "@/api/handler";
 import {team} from "@/api";
 
 const teamList = ref<ApiMap['/team/game/:id']['resp'] | null>(null)
+const pageSize = ref<number>(100)
 const headers = [
   { title: '组号', key: 'teamId', align: 'center' },
   { title: '组长姓名', key: 'leaderName', align: 'center' },
@@ -62,9 +64,3 @@ const useTeamList = (gameId: number) => {
 
 defineExpose({useTeamList})
 </script>
-
-<style scoped lang="scss">
-.team-list-table {
-  min-height: 700px;
-}
-</style>
