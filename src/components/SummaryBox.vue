@@ -5,51 +5,40 @@
       <v-btn variant="outlined" color="primary" @click="handleShowAI">AI总结</v-btn>
     </div>
     <div class="d-flex mx-6">
-      <RankList max-height="630" class="mr-6" style="flex: 1" :data="GameStatus" @click="handleShowTeamLog"/>
-      <TileRank max-height="630" style="flex: 1" :data="GameStatus" mode="student" @click="handleShowStudentLog"/>
+      <RankList :enable-edit="false" max-height="630" class="mr-6" style="flex: 1" :data="GameStatus"
+        @click="handleShowTeamLog" />
+      <TileRank :enable-edit="false" max-height="630" style="flex: 1" :data="GameStatus" mode="student"
+        @click="handleShowStudentLog" />
     </div>
   </div>
-  <v-overlay v-model="showOverlay"
-             class="align-center justify-center">
+  <v-overlay v-model="showOverlay" class="align-center justify-center">
     <v-card v-if="overlayMode !== 'ai'">
-      <div v-if="overlayMode === 'student'" class="pa-4 bg-blue-lighten-1 d-flex justify-center">{{selectedStudentName}} - 得分日志记录</div>
-      <div v-if="overlayMode === 'team'" class="pa-4 bg-blue-lighten-1 d-flex justify-center">第 {{selectedTeamId}} 组 - 得分日志记录</div>
-      <v-data-table-server v-if="overlayMode === 'student'"
-                           v-model:items-per-page="pageSizeStudent"
-                           v-model:page="pageNumStudent"
-                           :items-length="totalNumStudent"
-                           no-data-text="未查询到日志信息"
-                           density="comfortable"
-                           :headers="studentHeaders"
-                           items-per-page-text="每页展示："
-                           :page-text="`第 ${pageNumStudent} 页，共 ${totalNumStudent} 项`"
-                           @update:options="useStudentLog"
-                           class="pa-4"
-                           :items="studentLog"></v-data-table-server>
-      <v-data-table-server v-if="overlayMode === 'team'"
-                           v-model:items-per-page="pageSizeTeam"
-                           v-model:page="pageNumTeam"
-                           :items-length="totalNumTeam"
-                           no-data-text="未查询到日志信息"
-                           density="comfortable"
-                           :headers="teamHeaders"
-                           items-per-page-text="每页展示："
-                           :page-text="`第 ${pageNumTeam} 页，共 ${totalNumTeam} 项`"
-                           @update:options="useTeamLog"
-                           class="pa-4"
-                           :items="teamLog"></v-data-table-server>
+      <div v-if="overlayMode === 'student'" class="pa-4 bg-blue-lighten-1 d-flex justify-center">{{ selectedStudentName
+      }}
+        - 得分日志记录</div>
+      <div v-if="overlayMode === 'team'" class="pa-4 bg-blue-lighten-1 d-flex justify-center">第 {{ selectedTeamId }} 组 -
+        得分日志记录</div>
+      <v-data-table-server v-if="overlayMode === 'student'" v-model:items-per-page="pageSizeStudent"
+        v-model:page="pageNumStudent" :items-length="totalNumStudent" no-data-text="未查询到日志信息" density="comfortable"
+        :headers="studentHeaders" items-per-page-text="每页展示："
+        :page-text="`第 ${pageNumStudent} 页，共 ${totalNumStudent} 项`" @update:options="useStudentLog" class="pa-4"
+        :items="studentLog"></v-data-table-server>
+      <v-data-table-server v-if="overlayMode === 'team'" v-model:items-per-page="pageSizeTeam"
+        v-model:page="pageNumTeam" :items-length="totalNumTeam" no-data-text="未查询到日志信息" density="comfortable"
+        :headers="teamHeaders" items-per-page-text="每页展示：" :page-text="`第 ${pageNumTeam} 页，共 ${totalNumTeam} 项`"
+        @update:options="useTeamLog" class="pa-4" :items="teamLog"></v-data-table-server>
     </v-card>
-    <ChatBox v-else :id="GameStatus.id"/>
+    <ChatBox v-else :id="GameStatus.id" />
   </v-overlay>
 </template>
 
 <script setup lang="ts">
 import RankList from "@/components/proposal/RankList.vue";
 import TileRank from "@/components/board/TileRank.vue";
-import {defineProps, ref, watch} from "vue";
-import {ApiMap} from "@/api/type";
-import {useApi} from "@/api/handler";
-import {log} from "@/api";
+import { defineProps, ref, watch } from "vue";
+import { ApiMap } from "@/api/type";
+import { useApi } from "@/api/handler";
+import { log } from "@/api";
 import ChatBox from "@/components/ChatBox.vue";
 
 const props = defineProps<{
@@ -100,16 +89,16 @@ function handleShowAI() {
   showOverlay.value = true
 }
 
-function handleShowTeamLog(data: {item: {teamId: number}, index: number}) {
-  const {item} = data
+function handleShowTeamLog(data: { item: { teamId: number }, index: number }) {
+  const { item } = data
   overlayMode.value = 'team'
   showOverlay.value = true
   selectedTeamId.value = item.teamId
   useTeamLog()
 }
 
-function handleShowStudentLog(data: {mode: string, item: {studentId: number, studentName: string}, index: number}) {
-  const {mode, item} = data
+function handleShowStudentLog(data: { mode: string, item: { studentId: number, studentName: string }, index: number }) {
+  const { mode, item } = data
   if (mode === 'team') return
   overlayMode.value = 'student'
   showOverlay.value = true
@@ -150,10 +139,8 @@ const useTeamLog = () => {
 
 watch(() => props.data, newVal => {
   GameStatus.value = newVal ?? null
-}, {immediate: true})
+}, { immediate: true })
 </script>
 
 
-<style scoped lang="scss">
-
-</style>
+<style scoped lang="scss"></style>

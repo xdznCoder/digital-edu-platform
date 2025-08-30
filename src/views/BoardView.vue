@@ -10,63 +10,40 @@
           <v-expansion-panel-text class="pa-2">
             <div class="d-flex">
               <div class="mx-2">调整X轴方位</div>
-              <v-slider
-                  v-model="originX"
-                  :max="240"
-                  :min="0"
-                  :step="10"
-                  thumb-label
-              />
+              <v-slider v-model="originX" :max="240" :min="0" :step="10" thumb-label />
             </div>
             <div class="d-flex">
               <div class="mx-2">调整Y轴方位</div>
-              <v-slider
-                  v-model="originY"
-                  :max="240"
-                  :min="0"
-                  :step="10"
-                  thumb-label
-              />
+              <v-slider v-model="originY" :max="240" :min="0" :step="10" thumb-label />
             </div>
             <div class="d-flex">
               <div class="mx-2">调整棋盘大小</div>
-              <v-slider
-                  v-model="radius"
-                  :max="34"
-                  :min="10"
-                  :step="1"
-                  thumb-label
-              />
+              <v-slider v-model="radius" :max="34" :min="10" :step="1" thumb-label />
             </div>
           </v-expansion-panel-text>
         </v-expansion-panel>
       </v-expansion-panels>
-        <SpecialCard :data="GameStatus" @update="useGameStatus"/>
-        <TileRank :max-height="400" :data="GameStatus" show-change/>
+      <SpecialCard :data="GameStatus" @update="useGameStatus" />
+      <TileRank :enable-edit="true" :max-height="400" :data="GameStatus" show-change />
     </div>
-      <div style="flex: 2; min-width: 800px">
-      <BoardBox
-          v-if="GameStatus"
-          :data="GameStatus"
-          :origin-x="originX"
-          :origin-y="originY"
-          :radius="radius"
-          @update="useGameStatus"/>
+    <div style="flex: 2; min-width: 800px">
+      <BoardBox v-if="GameStatus" :data="GameStatus" :origin-x="originX" :origin-y="originY" :radius="radius"
+        @update="useGameStatus" />
     </div>
     <div class="right">
       <LegendBox />
-      <BoardStatus v-if="GameStatus" :data="GameStatus" @update="useGameStatus"/>
-      <GradeRank v-if="GameStatus" :game-id="gameId" :data="GameStatus" @update="useGameStatus"/>
+      <BoardStatus v-if="GameStatus" :data="GameStatus" @update="useGameStatus" />
+      <GradeRank v-if="GameStatus" :game-id="gameId" :data="GameStatus" @update="useGameStatus" />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import {useApi} from "@/api/handler";
-import {game} from "@/api";
-import {onMounted, ref, watch} from "vue";
-import {useRoute, useRouter} from "vue-router";
-import {ApiMap} from "@/api/type";
+import { useApi } from "@/api/handler";
+import { game } from "@/api";
+import { onMounted, ref, watch } from "vue";
+import { useRoute, useRouter } from "vue-router";
+import { ApiMap } from "@/api/type";
 import BoardBox from "@/components/board/BoardBox.vue";
 import BoardStatus from "@/components/board/BoardStatus.vue";
 import GradeRank from "@/components/board/GradeRank.vue";
@@ -90,7 +67,7 @@ onMounted(() => {
 
 watch(() => GameStatus.value, newVal => {
   if (!newVal) return
-  if (newVal.stage >= 2) router.push({path: '/proposal', query: {id: newVal.id}})
+  if (newVal.stage >= 2) router.push({ path: '/proposal', query: { id: newVal.id } })
 })
 
 const useGameStatus = () => {

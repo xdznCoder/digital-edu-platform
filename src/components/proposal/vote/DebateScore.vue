@@ -1,70 +1,43 @@
 <template>
-  <v-card class="pa-8" width="600">
+  <v-card class="pa-8" width="600" style="max-height: 80vh; overflow-y: auto;">
     <div class="mb-6 text-h6">辩论赛结果打分</div>
 
-    <div class="d-flex mb-4">
+    <div class="d-flex mb-4 justify-space-between">
       <div class="mt-1" style="width: 150px">老师正方评分</div>
-      <v-text-field
-          v-model.number="tempTeacherScorePro"
-          type="number"
-          min="0"
-          max="100"
-          variant="outlined"
-          density="compact"
-          placeholder="请输入老师正方评分"
-      ></v-text-field>
+      <v-text-field v-model.number="tempTeacherScorePro" type="number" min="0" max="100" variant="outlined"
+        density="compact" placeholder="请输入老师正方评分"></v-text-field>
     </div>
 
     <div class="d-flex mb-6">
       <div class="mt-1" style="width: 150px">老师反方评分</div>
-      <v-text-field
-          v-model.number="tempTeacherScoreCon"
-          type="number"
-          min="0"
-          max="100"
-          variant="outlined"
-          density="compact"
-          placeholder="请输入老师反方评分"
-      ></v-text-field>
+      <v-text-field v-model.number="tempTeacherScoreCon" type="number" min="0" max="100" variant="outlined"
+        density="compact" placeholder="请输入老师反方评分"></v-text-field>
     </div>
 
     <div class="mb-4 text-subtitle-1 font-weight-medium" v-if="tempStudentScores && tempStudentScores.length > 0">
       学生评分</div>
 
-    <div
-        v-for="(score, index) in tempStudentScores"
-        :key="index"
-        class="d-flex align-center mb-3"
-    >
+    <div v-for="(score, index) in tempStudentScores" :key="index" class="d-flex align-center mb-3">
       <div style="width: 150px" class="mt-1">小组 {{ score.fromTeamId }} 分数</div>
 
-      <v-text-field
-          v-model.number="score.scorePro"
-          type="number"
-          min="0"
-          max="100"
-          label="正方分"
-          variant="outlined"
-          density="compact"
-          class="mr-4"
-          hide-details
-          style="max-width: 120px"
-          placeholder="正方"
-      ></v-text-field>
+      <v-text-field v-model.number="score.scorePro" type="number" min="0" max="100" label="正方分" variant="outlined"
+        density="compact" class="mr-4" hide-details style="max-width: 120px" placeholder="正方"></v-text-field>
 
-      <v-text-field
-          v-model.number="score.scoreCon"
-          type="number"
-          min="0"
-          max="100"
-          label="反方分"
-          variant="outlined"
-          density="compact"
-          hide-details
-          style="max-width: 120px"
-          placeholder="反方"
-      ></v-text-field>
+      <v-text-field v-model.number="score.scoreCon" type="number" min="0" max="100" label="反方分" variant="outlined"
+        density="compact" hide-details style="max-width: 120px" placeholder="反方"></v-text-field>
     </div>
+
+    <div class="d-flex justify-end mb-4">
+      <div style="text-align: right; margin-right: 16px;">
+        <v-chip large :color="getProFinalScore > getConFinalScore ? 'green' : 'grey lighten-2'">正方最终平均分: {{
+          getProFinalScore
+        }}</v-chip>
+        <v-chip large :color="getConFinalScore > getProFinalScore ? 'green' : 'grey lighten-2'">反方最终平均分: {{
+          getConFinalScore
+        }}</v-chip>
+      </div>
+    </div>
+
 
     <div class="d-flex justify-end">
       <v-btn class="mr-4" color="primary" @click="handleSubmit">提交</v-btn>
@@ -74,7 +47,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, onMounted, defineProps, defineEmits } from 'vue'
+import { ref, watch, onMounted, defineProps, defineEmits, computed, watchEffect } from 'vue'
 import { useApi } from '@/api/handler'
 import { proposal } from '@/api'
 import type { ApiMap } from '@/api/type'
@@ -107,13 +80,31 @@ const useNeedScoreList = () => {
   })
 }
 
+const avgScorePro = computed(() => {
+  const scores = tempStudentScores.value.map(item => item.scorePro)
+  return scores.length ? scores.reduce((a, b) => a + b, 0) / scores.length : 0
+})
+
+const avgScoreCon = computed(() => {
+  const scores = tempStudentScores.value.map(item => item.scoreCon)
+  return scores.length ? scores.reduce((a, b) => a + b, 0) / scores.length : 0
+})
+
+const getProFinalScore = computed(() => {
+  return +(tempTeacherScorePro.value * 0.6 + avgScorePro.value * 0.4).toFixed(2)
+})
+
+const getConFinalScore = computed(() => {
+  return +(tempTeacherScoreCon.value * 0.6 + avgScoreCon.value * 0.4).toFixed(2)
+})
+
 watch(
-    () => props.data,
-    (newVal) => {
-      GameStatus.value = newVal
-      useNeedScoreList()
-    },
-    { immediate: true }
+  () => props.data,
+  (newVal) => {
+    GameStatus.value = newVal
+    useNeedScoreList()
+  },
+  { immediate: true }
 )
 
 onMounted(() => {
