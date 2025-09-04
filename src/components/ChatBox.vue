@@ -1,6 +1,5 @@
 <template>
   <v-card class="chat-card">
-    <!-- 顶部：标题 -->
     <div class="chat-header d-flex align-center justify-space-between px-6 py-4">
       <div class="d-flex align-center text-white text-h6">
         <v-icon icon="mdi-robot" start class="mr-2" />
@@ -10,7 +9,6 @@
 
     <v-divider />
 
-    <!-- 中部：聊天消息区 -->
     <v-sheet class="chat-window" height="530" rounded>
       <div
           v-for="(msg, index) in messages"
@@ -39,7 +37,6 @@
 
     <v-divider />
 
-    <!-- 底部：消息输入区 -->
     <div class="d-flex align-center px-4 py-2 chat-input-area">
       <v-text-field
           v-model="input"
@@ -59,8 +56,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, defineProps } from 'vue'
 import { BaseURL } from '@/api/request'
+
+const props = defineProps<{
+  id: number
+}>()
 
 const input = ref('')
 const sno = ref('')
@@ -88,7 +89,7 @@ function sendMessage() {
 
   const params = new URLSearchParams({
     sno: sno.value,
-    gameId: String(82),
+    gameId: String(props.id),
     message: userMessage,
     type: '1',
   })

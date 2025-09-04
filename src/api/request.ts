@@ -3,7 +3,11 @@ import axios, { AxiosRequestConfig } from "axios";
 import { user } from "@/api/index";
 import store from "@/store";
 
+<<<<<<< HEAD
 export const BaseURL = "http://118.24.186.26:8080";
+=======
+export const BaseURL = 'http://118.24.186.26:8080'
+>>>>>>> 8e14e7b (🚑 fix: tidy the summary view and fix the ai gameid issue)
 
 export async function request<K extends keyof ApiMap>(requestConfig: {
   url: K;

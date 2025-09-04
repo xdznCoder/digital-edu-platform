@@ -5,10 +5,14 @@
       <v-btn variant="outlined" color="primary" @click="handleShowAI">AI总结</v-btn>
     </div>
     <div class="d-flex mx-6">
-      <RankList :enable-edit="false" max-height="630" class="mr-6" style="flex: 1" :data="GameStatus"
-        @click="handleShowTeamLog" />
-      <TileRank :enable-edit="false" max-height="630" style="flex: 1" :data="GameStatus" mode="student"
-        @click="handleShowStudentLog" />
+      <v-col>
+        <RankList :enable-edit="false" max-height="630" class="mr-6" style="flex: 1" :data="GameStatus"
+          @click="handleShowTeamLog" />
+      </v-col>
+      <v-col>
+        <TileRank :enable-edit="false" max-height="630" style="flex: 1" :data="GameStatus" mode="student"
+          @click="handleShowStudentLog" />
+      </v-col>
     </div>
   </div>
   <v-overlay v-model="showOverlay" class="align-center justify-center">
