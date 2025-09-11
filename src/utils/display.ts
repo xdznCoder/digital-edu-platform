@@ -23,7 +23,12 @@ const teamColorMap = [
     '#FFE59F',
     '#99EEEE',
     '#CCCCFF',
-    '#FFCCE5'
+    '#FFCCE5',
+    '#1EEAEE',
+    '#96BBEE',
+    '#11EE99',
+    '#234399',
+    '#914561'
 ]
 
 export function displayTrans(type: 'stage' | 'chessPhase', code: number): string {
