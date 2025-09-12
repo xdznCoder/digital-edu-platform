@@ -10,7 +10,6 @@ export const user = {
       data: {
         username: email,
         password: password,
-        email: "",
         emailCode: "",
         loginType: 1,
       },
@@ -20,9 +19,8 @@ export const user = {
       url: "/user/login",
       method: "POST",
       data: {
-        username: "",
+        username: email,
         password: "",
-        email: email,
         emailCode: code,
         loginType: 0,
       },

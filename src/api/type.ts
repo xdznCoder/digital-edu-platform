@@ -7,7 +7,6 @@ export interface ApiMap {
     req: {
       username: string;
       password: string;
-      email: string;
       emailCode: string;
       loginType: number;
     };
@@ -24,9 +23,9 @@ export interface ApiMap {
     req: {
       username: string;
       password: string;
+      email: string;
       nickname: string;
       avatar: string;
-      email: string;
       type: number;
       code: string;
     };
