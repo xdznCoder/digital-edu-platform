@@ -364,11 +364,13 @@ export interface ApiMap {
     req: {
       gameId: number;
       round: number;
-      votes: Array<{
+      votes?: Array<{
         teamId: number;
         score: number;
         proposalId: number;
       }>;
+      hasTie: boolean;
+      winnerProposalId?: number;
     };
     resp: null;
   };
